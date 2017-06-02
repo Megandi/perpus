@@ -31,7 +31,7 @@ if (!defined('INDEX_AUTH')) {
 // load settings from database
 utility::loadSettings($dbs);
 
-$allowed_counter_ip = array('127.0.0.1');
+$allowed_counter_ip = array('127.0.0.1'); // edit sini supaya bisa aktif
 $remote_addr = $_SERVER['REMOTE_ADDR'];
 $confirmation = 0;
 $limit_time_visit = $sysconf['time_visitor_limitation'];
@@ -53,7 +53,27 @@ ob_start();
 
 define('INSTITUTION_EMPTY', 11);
 define('ALREADY_CHECKIN', 12);
-
+// Kembalikan loker
+if (isset($_POST['locker_return'])) {
+  global $dbs;
+  $locker=$_POST['locker'];
+  $_q = $dbs->query('SELECT locker_return FROM visitor_count WHERE locker=\''.$locker.'\' ORDER BY locker_return DESC LIMIT 1');
+  $_d = $_q->fetch_assoc();
+  if ($_d['locker_return'] == "1" )
+  {
+    echo __('Locker lock has been restored');
+  }
+  else if ($_q->num_rows > 0) {
+  $_checkin_sql   = "UPDATE visitor_count SET locker_return='1' WHERE locker='$locker' ";
+  $_i = $dbs->query($_checkin_sql);
+    echo __('Thank you for returning the locker key');
+  }
+  else 
+  {
+    echo __('Locker number not listed');
+  }
+  exit();
+}
 if (isset($_POST['counter'])) {
    if (trim($_POST['memberID']) == '') {
      die();
@@ -109,12 +129,13 @@ if (isset($_POST['counter'])) {
         }
         $member_id      = $_d['member_id'];
         $member_name    = $_d['member_name'];
+        $locker = $dbs->escape_string(trim($_POST['locker']));
         $member_name    = preg_replace("/'/", "\'", $member_name);
         $photo          = trim($_d['member_image'])?trim($_d['member_image']):'person.png';
         $_institution   = $dbs->escape_string(trim($_d['inst_name']))?$dbs->escape_string(trim($_d['inst_name'])):null;
         
         $_checkin_date  = date('Y-m-d H:i:s');
-        $_checkin_sql   = "INSERT INTO visitor_count (member_id, member_name, institution, checkin_date) VALUES ('$member_id', '$member_name', '$_institution', '$_checkin_date')";
+        $_checkin_sql   = "INSERT INTO visitor_count (member_id, member_name, institution, locker, locker_return, checkin_date) VALUES ('$member_id', '$member_name', '$_institution', '$locker', null, '$_checkin_date')";
         
         // limitation
         if ($sysconf['enable_visitor_limitation']) {
@@ -132,12 +153,13 @@ if (isset($_POST['counter'])) {
         $_d = $_q->fetch_assoc();
         $member_name = $dbs->escape_string(trim($_POST['memberID']));
         $_institution = $dbs->escape_string(trim($_POST['institution']));
+        $locker = $dbs->escape_string(trim($_POST['locker']));
         $photo = 'non_member.png';
         $_checkin_date = date('Y-m-d H:i:s');
         if (!$_institution) {
             return INSTITUTION_EMPTY;
         } else {
-          $_checkin_sql = "INSERT INTO visitor_count (member_name, institution, checkin_date) VALUES ('$member_name', '$_institution', '$_checkin_date')";
+          $_checkin_sql = "INSERT INTO visitor_count (member_name, institution,  locker, locker_return, checkin_date) VALUES ('$member_name', '$_institution', '$locker', null, '$_checkin_date')";
           // limitation
           if ($sysconf['enable_visitor_limitation']) {
             $already_checkin = checkVisit($member_name, false);
@@ -182,6 +204,7 @@ $(document).ready( function() {
   $('#memberID').focus();
   var visitorCounterForm = $('#visitorCounterForm');
   var defaultMsg = $('#counterInfo').html();
+  var lokerreturnForm = $('#returnlockerForm');
   // register event
   visitorCounterForm.on('submit', function(e) {
     e.preventDefault();
@@ -230,7 +253,47 @@ $(document).ready( function() {
           }
       });
   });
-
+  // Kembalikan loker
+  lokerreturnForm.on('submit', function(e) {
+    e.preventDefault();
+    // check  loker
+    if ($.trim($('#locker_s').val()) == '') {
+      $('#counterInfo').html('Please fill your nomer locker');
+      return false;
+    }
+    var theForm     = $(this);
+    var formAction  = theForm.attr('action');
+    var formData    = theForm.serialize();
+    formData       += '&locker_return=true';
+    // block the form
+    theForm.disableForm();
+    $('#counterInfo').html('Please Wait ...');
+    // create AJAX request for submitting form
+    $.ajax({ url: formAction,
+          type: 'POST',
+          async: false,
+          data: formData,
+          cache: false,
+          success: function(respond) {
+            $('#counterInfo').html(respond);
+            // reset counter
+            setTimeout(function() { 
+              $('#counterInfo').html(defaultMsg); 
+              lokerreturnForm.enableForm().find('input[type=text]').val('');
+              $('#memberID').focus();
+            }, 5000);
+          },
+          complete: function() {
+            $(this).enableForm().find('input[type=text]').val('');
+            $('#memberID').focus();         
+          },
+          error: function(){
+            alert('Error inserting counter data to database!');
+            $(this).enableForm().find('input[type=text]').val('');
+            $('#memberID').focus();
+          }
+      });
+  });
 });
 </script>
 

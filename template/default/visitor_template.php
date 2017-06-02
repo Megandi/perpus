@@ -40,17 +40,24 @@ $main_template_path = $sysconf['template']['dir'].'/'.$sysconf['template']['them
 
     <div class="row"> 
 
-      <div class="col-lg-6 col-sm-6 col-xs-12">
+      <div class="col-lg-4 col-sm-4 col-xs-12">
         <div class="form-group"> 
           <input type="text" name="memberID" id="memberID"  class="form-control input-lg" />
           <label for="memberID"><?php echo __('Member ID / Visitor Name'); ?></label>
         </div> 
       </div>
 
-      <div class="col-lg-6 col-sm-6 col-xs-12">
+      <div class="col-lg-4 col-sm-4 col-xs-12">
         <div class="form-group"> 
           <input type="text" name="institution" id="institution" class="form-control input-lg" />
           <label for="institution"><?php echo __('Institution'); ?></label>
+        </div> 
+      </div>
+
+            <div class="col-lg-4 col-sm-4 col-xs-12">
+        <div class="form-group"> 
+          <input type="text" name="locker" id="locker" class="form-control input-lg" />
+          <label for="locker"><?php echo __('Number Locker'); ?></label>
         </div> 
       </div>
     
@@ -59,10 +66,30 @@ $main_template_path = $sysconf['template']['dir'].'/'.$sysconf['template']['them
       <div class="col-lg-12 col-sm-12 col-xs-12">
         <input type="submit" id="counter" name="counter" class="form-control input-lg" value="<?php echo __('Add'); ?>">
       </div>
+      </div>
     </div>
 
   </form>
 
+</div>
+
+<div class="s-visitor container" style="margin-top: 10px; margin-bottom: 70px; border-top: dashed 1px #ffffff; padding-top: 10px;  ">
+  <form action="index.php?p=visitor" name="returnlockerForm" id="returnlockerForm" method="post">
+     <div class="row"> 
+     <div class="col-lg-12 col-sm-12 col-xs-12">
+        <div class="form-group"> 
+          <input type="text" name="locker" id="locker_s" class="form-control input-lg" />
+          <label for="locker"><?php echo __('Number Locker'); ?></label>
+        </div> 
+      </div>
+    
+      <div class="clearfix"></div>
+
+      <div class="col-lg-12 col-sm-12 col-xs-12">
+        <input type="submit" id="counter" name="counter" class="form-control input-lg" value="<?php echo __('Locker Return'); ?>">
+      </div>
+     </div>
+  </form>
 </div>
 <script>
   $('#login-page, .s-login').attr('style','margin:0;')

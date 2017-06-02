@@ -1,9 +1,9 @@
 <?php
 /**
  *
- * Copyright (C) 2010  Arie Nugraha (dicarve@yahoo.com)
+ * Copyright (C) 2007,2008  Arie Nugraha (dicarve@yahoo.com)
  * Modified for Excel output (C) 2010 by Wardiyono (wynerst@gmail.com)
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -20,7 +20,7 @@
  *
  */
 
-/* Library Visitor List */
+/* Library Member List */
 
 // key to authenticate
 define('INDEX_AUTH', '1');
@@ -49,7 +49,7 @@ require SIMBIO.'simbio_GUI/form_maker/simbio_form_element.inc.php';
 require SIMBIO.'simbio_DB/datagrid/simbio_dbgrid.inc.php';
 require MDLBS.'reporting/report_dbgrid.inc.php';
 
-$page_title = 'Visitors Report';
+$page_title = 'Members Report Active';
 $reportView = false;
 $num_recs_show = 20;
 if (isset($_GET['reportView'])) {
@@ -61,8 +61,8 @@ if (!$reportView) {
     <!-- filter -->
     <fieldset>
     <div class="per_title">
-    	<h2><?php echo __('Visitor List'); ?></h2>
-	  </div>
+      <h2><?php echo __('Member List Active'); ?></h2>
+    </div>
     <div class="infoBox">
     <?php echo __('Report Filter'); ?>
     </div>
@@ -76,7 +76,6 @@ if (!$reportView) {
             $mtype_q = $dbs->query('SELECT member_type_id, member_type_name FROM mst_member_type');
             $mtype_options = array();
             $mtype_options[] = array('0', __('ALL'));
-            $mtype_options[] = array('-1', __('NON-Member visitor'));
             while ($mtype_d = $mtype_q->fetch_row()) {
                 $mtype_options[] = array($mtype_d[0], $mtype_d[1]);
             }
@@ -85,25 +84,36 @@ if (!$reportView) {
             </div>
         </div>
         <div class="divRow">
-            <div class="divRowLabel"><?php echo __('Visitor ID').'/'.__('Visitor Name'); ?></div>
+            <div class="divRowLabel"><?php echo __('Member ID').'/'.__('Member Name'); ?></div>
             <div class="divRowContent">
             <?php echo simbio_form_element::textField('text', 'id_name', '', 'style="width: 50%"'); ?>
             </div>
         </div>
         <div class="divRow">
-            <div class="divRowLabel"><?php echo __('Institution'); ?></div>
+            <div class="divRowLabel"><?php echo __('Gender'); ?></div>
             <div class="divRowContent">
-            <?php echo simbio_form_element::textField('text', 'institution', '', 'style="width: 50%"'); ?>
+            <?php
+            $gender_chbox[0] = array('ALL', __('ALL'));
+            $gender_chbox[1] = array('1', __('Male'));
+            $gender_chbox[2] = array('0', __('Female'));
+            echo simbio_form_element::radioButton('gender', $gender_chbox, 'ALL');
+            ?>
             </div>
         </div>
         <div class="divRow">
-            <div class="divRowLabel"><?php echo __('Visit Date From'); ?></div>
+            <div class="divRowLabel"><?php echo __('Address'); ?></div>
+            <div class="divRowContent">
+            <?php echo simbio_form_element::textField('text', 'address', '', 'style="width: 50%"'); ?>
+            </div>
+        </div>
+        <div class="divRow">
+            <div class="divRowLabel"><?php echo __('Register Date From'); ?></div>
             <div class="divRowContent">
             <?php echo simbio_form_element::dateField('startDate', '2000-01-01'); ?>
             </div>
         </div>
         <div class="divRow">
-            <div class="divRowLabel"><?php echo __('Visit Date Until'); ?></div>
+            <div class="divRowLabel"><?php echo __('Register Date Until'); ?></div>
             <div class="divRowContent">
             <?php echo simbio_form_element::dateField('untilDate', date('Y-m-d')); ?>
             </div>
@@ -128,40 +138,37 @@ if (!$reportView) {
 } else {
     ob_start();
     // table spec
-    $table_spec = 'visitor_count AS vc
-        LEFT JOIN (member AS m LEFT JOIN mst_member_type AS mt ON m.member_type_id=mt.member_type_id)
-        ON vc.member_id=m.member_id';
+    $table_spec = 'member AS m
+        LEFT JOIN mst_member_type AS mt ON m.member_type_id=mt.member_type_id';
 
-    // create datagrid edit loker
+    // create datagrid
     $reportgrid = new report_datagrid();
-    $reportgrid->setSQLColumn('IF(vc.member_id IS NOT NULL, vc.member_id, \'NON-MEMBER\')  AS \''.__('Member ID').'\'',
-        'vc.member_name AS \''.__('Visitor Name').'\'',
-        'IF(mt.member_type_name IS NOT NULL, mt.member_type_name, \'NON-MEMBER\') AS \''.__('Membership Type').'\'',
-        'vc.institution AS \''.__('Institution').'\'','vc.locker AS \''.__('Locker').'\'','IF(vc.locker IS NULL,\''.__('-').'\',IF(vc.locker_return IS NOT NULL,\''.__('Yes').'\',\''.__('No').'\')) AS \''.__('Locker Return').'\'',
-        'vc.checkin_date AS \''.__('Visit Date').'\'');
-    $reportgrid->setSQLorder('vc.member_id ASC');
+    $reportgrid->setSQLColumn('m.member_id AS \''.__('Member ID').'\'',
+        'm.member_name AS \''.__('Member Name').'\'',
+        'mt.member_type_name AS \''.__('Membership Type').'\'');
+    $reportgrid->setSQLorder('member_name ASC');
 
     // is there any search
-    $criteria = 'vc.visitor_id IS NOT NULL ';
+    $criteria = 'm.member_id IS NOT NULL AND TO_DAYS(expire_date)>TO_DAYS(\''.date('Y-m-d').'\')';
     if (isset($_GET['member_type']) AND !empty($_GET['member_type'])) {
-        $mtype = $_GET['member_type'];
-        if (intval($mtype) < 0) {
-            $criteria .= ' AND (vc.member_id IS NULL OR vc.member_id=\'\')';
-        } else if (intval($mtype) > 0) {
-            $criteria .= ' AND mt.member_type_id='.$mtype;
-        }
+        $mtype = intval($_GET['member_type']);
+        $criteria .= ' AND m.member_type_id='.$mtype;
     }
     if (isset($_GET['id_name']) AND !empty($_GET['id_name'])) {
         $id_name = $dbs->escape_string($_GET['id_name']);
-        $criteria .= ' AND (vc.member_id LIKE \'%'.$id_name.'%\' OR vc.member_name LIKE \'%'.$id_name.'%\')';
+        $criteria .= ' AND (m.member_id LIKE \'%'.$id_name.'%\' OR m.member_name LIKE \'%'.$id_name.'%\')';
     }
-    if (isset($_GET['institution']) AND !empty($_GET['institution'])) {
-        $institution = $dbs->escape_string(trim($_GET['institution']));
-        $criteria .= ' AND vc.institution LIKE \'%'.$institution.'%\'';
+    if (isset($_GET['gender']) AND $_GET['gender'] != 'ALL') {
+        $gender = intval($_GET['gender']);
+        $criteria .= ' AND m.gender='.$gender;
+    }
+    if (isset($_GET['address']) AND !empty($_GET['address'])) {
+        $address = $dbs->escape_string(trim($_GET['address']));
+        $criteria .= ' AND m.member_address LIKE \'%'.$address.'%\'';
     }
     // register date
     if (isset($_GET['startDate']) AND isset($_GET['untilDate'])) {
-        $criteria .= ' AND (TO_DAYS(vc.checkin_date) BETWEEN TO_DAYS(\''.$_GET['startDate'].'\') AND
+        $criteria .= ' AND (TO_DAYS(m.register_date) BETWEEN TO_DAYS(\''.$_GET['startDate'].'\') AND
             TO_DAYS(\''.$_GET['untilDate'].'\'))';
     }
     if (isset($_GET['recsEachPage'])) {
@@ -176,20 +183,15 @@ if (!$reportView) {
     echo '<script type="text/javascript">'."\n";
     echo 'parent.$(\'#pagingBox\').html(\''.str_replace(array("\n", "\r", "\t"), '', $reportgrid->paging_set).'\');'."\n";
     echo '</script>';
-	$xlsquery = 'SELECT IF(vc.member_id IS NOT NULL, vc.member_id, \'NON-MEMBER\')  AS \''.__('Member ID').'\''.
-        ', vc.member_name AS \''.__('Visitor Name').'\''.
-        ', IF(mt.member_type_name IS NOT NULL, mt.member_type_name, \'NON-MEMBER\') AS \''.__('Membership Type').'\''.
-        ', vc.locker AS \''.__('Locker').'\''.', IF(vc.locker IS NULL,\''.__('-').'\',IF(vc.locker_return IS NOT NULL, \''.__('Yes').'\', \''.__('No').'\')) AS \''.__('Locker Return').'\''.
-        ', vc.institution AS \''.__('Institution').'\''.
-        ', vc.checkin_date AS \''.__('Visit Date').'\''.
-		' FROM '.$table_spec.' WHERE '.$criteria. ' ORDER BY vc.member_id ASC';
+	$xlsquery = 'SELECT m.member_id AS \''.__('Member ID').'\''.
+        ', m.member_name AS \''.__('Member Name').'\''.
+        ', mt.member_type_name AS \''.__('Membership Type').'\' FROM '.$table_spec.' WHERE '.$criteria;
 
-		unset($_SESSION['xlsdata']); 
-		$_SESSION['xlsquery'] = $xlsquery;
-		$_SESSION['tblout'] = "visitor_list";
+	unset($_SESSION['xlsdata']);
+	$_SESSION['xlsquery'] = $xlsquery;
+	$_SESSION['tblout'] = "member_list";
 
-	echo '<p><a href="../xlsoutput.php" class="button">'.__('Export to spreadsheet format').'</a></p>';
-
+	echo '<a href="../xlsoutput.php" class="button">'.__('Export to spreadsheet format').'</a>';
     $content = ob_get_clean();
     // include the page template
     require SB.'/admin/'.$sysconf['admin_template']['dir'].'/printed_page_tpl.php';
