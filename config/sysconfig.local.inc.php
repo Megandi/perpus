@@ -31,7 +31,7 @@ if (!defined('INDEX_AUTH')) {
 // database constant
 // change below setting according to your database configuration
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'perpus');
+define('DB_NAME', 'slims');
 define('DB_USERNAME', 'root');
 define('DB_PASSWORD', '');
 

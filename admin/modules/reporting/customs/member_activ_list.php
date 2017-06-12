@@ -119,6 +119,26 @@ if (!$reportView) {
             </div>
         </div>
         <div class="divRow">
+            <div class="divRowLabel"><?php echo __('Generation'); ?></div>
+            <div class="divRowContent">
+            <?php
+                $generation_options[] = array(16,'2016');
+                $generation_options[] = array(17,'2017');
+            echo simbio_form_element::selectList('generation', $generation_options);
+            ?>
+            </div>
+        </div>
+        <div class="divRow">
+            <div class="divRowLabel"><?php echo __('Major'); ?></div>
+            <div class="divRowContent">
+            <?php
+                $major_options[] = array(52,'Ilmu Komputer');
+                $major_options[] = array(51,'Ilmu Kimia');
+            echo simbio_form_element::selectList('major', $major_options);
+            ?>
+            </div>
+        </div>
+        <div class="divRow">
             <div class="divRowLabel"><?php echo __('Record each page'); ?></div>
             <div class="divRowContent"><input type="text" name="recsEachPage" size="3" maxlength="3" value="<?php echo $num_recs_show; ?>" /> <?php echo __('Set between 20 and 200'); ?></div>
         </div>
@@ -136,16 +156,42 @@ if (!$reportView) {
     <iframe name="reportView" id="reportView" src="<?php echo $_SERVER['PHP_SELF'].'?reportView=true'; ?>" frameborder="0" style="width: 100%; height: 500px;"></iframe>
 <?php
 } else {
+
     ob_start();
+function kode_angkatan($id)
+{
+    $id=substr($id,4,2);
+    return "20".$id;
+}
+function kode_prodi($id)
+{
+    $id=substr($id,2,2);
+    return $id;
+}
+function nama_prodi($id)
+{   switch ($id) {
+        case 52:
+            $id="Ilmu Komputer";
+            break;
+        case 51:
+            $id="Ilmu Kimia";
+            break;
+        default:
+            $id="tidak ada";
+            break;
+    }
+    return $id;
+}
     // table spec
     $table_spec = 'member AS m
         LEFT JOIN mst_member_type AS mt ON m.member_type_id=mt.member_type_id';
 
     // create datagrid
     $reportgrid = new report_datagrid();
-    $reportgrid->setSQLColumn('m.member_id AS \''.__('Member ID').'\'',
+    $reportgrid->setSQLColumn('substr(m.member_id,5,2) AS \''.__('Generation').'\'','substr(m.member_id,3,2) AS \''.__('Major').'\'','m.member_id AS \''.__('Member ID').'\'',
         'm.member_name AS \''.__('Member Name').'\'',
-        'mt.member_type_name AS \''.__('Membership Type').'\'');
+        'mt.member_type_name AS \''.__('Membership Type').'\'',
+        'm.member_since_date AS \''.__('Membership Since').'\'');
     $reportgrid->setSQLorder('member_name ASC');
 
     // is there any search
@@ -165,6 +211,16 @@ if (!$reportView) {
     if (isset($_GET['address']) AND !empty($_GET['address'])) {
         $address = $dbs->escape_string(trim($_GET['address']));
         $criteria .= ' AND m.member_address LIKE \'%'.$address.'%\'';
+    }
+    //more generation
+        if (isset($_GET['generation']) AND !empty($_GET['generation'])) {
+        $generation = $dbs->escape_string(trim($_GET['generation']));
+        $criteria .= ' AND substr(m.member_id,5,2)=\''.$generation.'\'';    
+    }
+    //more generation
+        if (isset($_GET['major']) AND !empty($_GET['major'])) {
+        $major = $dbs->escape_string(trim($_GET['major']));
+        $criteria .= ' AND substr(m.member_id,3,2)=\''.$major.'\'';  
     }
     // register date
     if (isset($_GET['startDate']) AND isset($_GET['untilDate'])) {

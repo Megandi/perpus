@@ -83,6 +83,20 @@ class simbio_datagrid extends simbio_table
      * @param   boolean $bool_editable
      * @return  string
      */
+    public function nama_prodi($id)
+    {   switch ($id) {
+        case 52:
+            $id="Ilmu Komputer";
+            break;
+        case 51:
+            $id="Ilmu Kimia";
+            break;
+        default:
+            $id="tidak ada";
+            break;
+    }
+    return $id;
+    }
     public function createDataGrid($obj_db, $str_db_table = '', $int_num2show = 30, $bool_editable = false)
     {
         // Default checkbox properties
@@ -416,6 +430,7 @@ class simbio_datagrid extends simbio_table
      */
     public function setSQLColumn()
     {
+
         $_args_num = func_num_args();
         if ($_args_num < 1) {
             $this->sql_column = '*';
@@ -430,7 +445,7 @@ class simbio_datagrid extends simbio_table
                 $_real_column = '';
                 if (preg_match('/\sAS\s/i', $_field)) {
                     $_field_n_alias = explode(' AS ', $_field);
-                    $_real_column = $_field_n_alias[0];
+                    $_real_column =$_field_n_alias[0];
                     $_column_alias = str_replace("'", '', $_field_n_alias[1]);
                 } else {
                     $_real_column = $_field;
