@@ -122,18 +122,49 @@ if (!$reportView) {
             <div class="divRowLabel"><?php echo __('Generation'); ?></div>
             <div class="divRowContent">
             <?php
+                $generation_options[] = array(1,'ALL');
                 $generation_options[] = array(2016,'2016');
                 $generation_options[] = array(2017,'2017');
+                $generation_options[] = array(2018,'2018');
             echo simbio_form_element::selectList('generation', $generation_options);
             ?>
             </div>
         </div>
         <div class="divRow">
+            <div class="divRowLabel"><?php echo __('Faculty'); ?></div>
+            <div class="divRowContent">
+            <?php
+                $faculty_options[] = array(0,'ALL');
+                $faculty_options[] = array(1,'Fakultas Teknologi Eksplorasi dan Produksi');
+                $faculty_options[] = array(2,'Fakultas Teknologi Industri');
+                $faculty_options[] = array(3,'Fakultas Management dan Bisnis');
+                $faculty_options[] = array(4,'Fakultas Perencanaan infrastruktur');
+                $faculty_options[] = array(5,'Fakultas Sains dan Komputer');
+                $faculty_options[] = array(6,'Fakultas Komunikasi dan Diplomasi');
+            echo simbio_form_element::selectList('faculty', $faculty_options);
+            ?>
+            </div>
+        </div>
+               <div class="divRow">
             <div class="divRowLabel"><?php echo __('Major'); ?></div>
             <div class="divRowContent">
             <?php
+                $major_options[] = array(1,'ALL');
+                $major_options[] = array('Teknik Geofisika','Teknik Geofisika');
+                $major_options[] = array('Teknik Geologi','Teknik Geologi');
+                $major_options[] = array('Teknik Perminyakan','Teknik Perminyakan');
+                $major_options[] = array('Teknik Elektro','Teknik Elektro');
+                $major_options[] = array('Teknik Mesin','Teknik Mesin');
+                $major_options[] = array('Teknik Kimia','Teknik Kimia');
+                $major_options[] = array('Teknik Logistik','Teknik Logistik');
+                $major_options[] = array('Teknik Sipil','Teknik Sipil');
+                $major_options[] = array('Teknik Lingkungan','Teknik Lingkungan');
                 $major_options[] = array('Ilmu Komputer','Ilmu Komputer');
                 $major_options[] = array('Ilmu Kimia','Ilmu Kimia');
+                $major_options[] = array('Management','Management');
+                $major_options[] = array('Ekonomi','Ekonomi');
+                $major_options[] = array('Komunikasi','Komunikasi');
+                $major_options[] = array('Hubungan Internasional','Hubungan Internasional');
             echo simbio_form_element::selectList('major', $major_options);
             ?>
             </div>
@@ -189,14 +220,19 @@ if (!$reportView) {
         $criteria .= ' AND m.member_address LIKE \'%'.$address.'%\'';
     }
     //more generation
-        if (isset($_GET['generation']) AND !empty($_GET['generation'])) {
+        if (isset($_GET['generation']) AND !empty($_GET['generation']) AND $_GET['generation']!=1) {
         $generation = $dbs->escape_string(trim($_GET['generation']));
         $criteria .= ' AND m.generation=\''.$generation.'\'';    
     }
     //more generation
-        if (isset($_GET['major']) AND !empty($_GET['major'])) {
+        if (isset($_GET['major']) AND !empty($_GET['major']) AND $_GET['major']!=1) {
         $major = $dbs->escape_string(trim($_GET['major']));
         $criteria .= ' AND m.major=\''.$major.'\'';  
+    }
+    //more generation
+        if (isset($_GET['faculty']) AND !empty($_GET['faculty']) AND $_GET['faculty']!=0) {
+        $faculty = $dbs->escape_string(trim($_GET['faculty']));
+        $criteria .= ' AND substr(m.member_id,3,1)=\''.$faculty.'\'';
     }
     // register date
     if (isset($_GET['startDate']) AND isset($_GET['untilDate'])) {
