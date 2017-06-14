@@ -47,6 +47,7 @@ require SIMBIO.'simbio_GUI/paging/simbio_paging.inc.php';
 require SIMBIO.'simbio_DB/datagrid/simbio_dbgrid.inc.php';
 require MDLBS.'reporting/report_dbgrid.inc.php';
 
+
 $page_title = 'Overdued List Report';
 $reportView = false;
 $num_recs_show = 20;
@@ -156,8 +157,12 @@ if (!$reportView) {
   $reportgrid->column_width = array('1' => '80%');
 
   // callback function to show overdued list
-  function showOverduedList($obj_db, $array_data)
+  function showOverduedList($obj_db, $array_data, $rec_d, $dbs)
   {
+      //sql count fine
+      $rec_q = $obj_db->query('SELECT * FROM mst_fine WHERE fine_id=1');
+      $rec_d = $rec_q->fetch_assoc();
+
       global $date_criteria;
 
       // member name
@@ -179,10 +184,14 @@ if (!$reportView) {
       $_buffer .= '<div style="font-size: 10pt; margin-bottom: 3px;"><div id="'.$array_data[0].'emailStatus"></div>'.__('E-mail').': <a href="mailto:'.$member_d[1].'">'.$member_d[1].'</a> - <a class="usingAJAX" href="'.MWB.'membership/overdue_mail.php'.'" postdata="memberID='.$array_data[0].'" loadcontainer="'.$array_data[0].'emailStatus">' . __('Send Notification e-mail') . '</a> - '.__('Phone Number').': '.$member_d[2].'</div>';
       $_buffer .= '<table width="100%" cellspacing="0">';
       while ($ovd_title_d = $ovd_title_q->fetch_assoc()) {
+          $haritotal = $ovd_title_d['Overdue Days']/$rec_d['days'];
+          $finetotal = $haritotal * $rec_d['price'];
+
           $_buffer .= '<tr>';
           $_buffer .= '<td valign="top" width="10%">'.$ovd_title_d['item_code'].'</td>';
           $_buffer .= '<td valign="top" width="40%">'.$ovd_title_d['title'].'<div>'.__('Price').': '.$ovd_title_d['price'].' '.$ovd_title_d['price_currency'].'</div></td>';
           $_buffer .= '<td width="20%">'.__('Overdue').': '.$ovd_title_d['Overdue Days'].' '.__('day(s)').'</td>';
+          $_buffer .= '<td width="20%">'.__('Fine Total').': '.number_format($finetotal, '2').'</td>';
           $_buffer .= '<td width="30%">'.__('Loan Date').': '.$ovd_title_d['loan_date'].' &nbsp; '.__('Due Date').': '.$ovd_title_d['due_date'].'</td>';
           $_buffer .= '</tr>';
       }
