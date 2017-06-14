@@ -107,8 +107,8 @@ if (!$reportView) {
             <div class="divRowContent">
             <?php
                 $generation_options[] = array(1,'ALL');
-                $generation_options[] = array(16,'2016');
-                $generation_options[] = array(17,'2017');
+                $generation_options[] = array(2016,'2016');
+                $generation_options[] = array(2017,'2017');
             echo simbio_form_element::selectList('generation', $generation_options);
             ?>
             </div>
@@ -157,10 +157,6 @@ if (!$reportView) {
   <script type="text/javascript" src="<?php echo JWB; ?>jquery.js"></script>
 <?php
     // generate dashboard content
-    $get_date       = '';
-    $get_loan       = '';
-    $get_return     = '';
-    $get_extends    = '';
      $start_date    = date("F j, Y");  
 
     $table_spec = 'member AS m
@@ -178,7 +174,7 @@ if (!$reportView) {
     //more generation
         if (isset($_GET['generation']) AND !empty($_GET['generation']) AND $_GET['generation']!=1) {
         $generation = $dbs->escape_string(trim($_GET['generation']));
-        $criteria .= ' AND m.generation=\''.$generation.'\'';    
+        $criteria .= ' AND m.generation=\''.$generation.'\'';  
     }
     // register date
     if (isset($_GET['startDate']) AND isset($_GET['untilDate'])) {
