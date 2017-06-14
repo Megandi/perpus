@@ -163,7 +163,7 @@ if (!$reportView) {
                 $major_options[] = array('Ilmu Kimia','Ilmu Kimia');
                 $major_options[] = array('Management','Management');
                 $major_options[] = array('Ekonomi','Ekonomi');
-                $major_options[] = array('Komunikasi','Komunikasi');
+                $major_options[] = array('Ilmu Komunikasi','Ilmu Komunikasi');
                 $major_options[] = array('Hubungan Internasional','Hubungan Internasional');
             echo simbio_form_element::selectList('major', $major_options);
             ?>

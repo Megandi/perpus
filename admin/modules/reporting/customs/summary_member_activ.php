@@ -192,95 +192,13 @@ if (!$reportView) {
     }
 
     // get total ilmu_komputer
-    $sql_total_ilmu_komputer = 'SELECT  COUNT(member_id) AS total  FROM '.$table_spec.' WHERE m.major=\'Ilmu Komputer\' AND '.$criteria;
-    $total_ilmu_komputer = $dbs->query($sql_total_ilmu_komputer);
-    $ilmu_komputer      = $total_ilmu_komputer->fetch_object();
-    $get_ilmu_komputer = $ilmu_komputer->total;
-    echo $get_ilmu_komputer;
-
-        // get total ilmu_komputer
-    $sql_total_teknik_geofisika = 'SELECT  COUNT(member_id) AS total  FROM '.$table_spec.' WHERE m.major=\'Teknik Geofisika\' AND '.$criteria;
-    $total_teknik_geofisika = $dbs->query($sql_total_teknik_geofisika);
-    $teknik_geofisika     = $total_teknik_geofisika->fetch_object();
-    $get_teknik_geofisika = $teknik_geofisika->total;
-
-    // get total ilmu_komputer
-    $sql_total_teknik_perminyakan = 'SELECT  COUNT(member_id) AS total  FROM '.$table_spec.' WHERE m.major=\'Teknik Perminyakan\' AND '.$criteria;
-    $total_teknik_perminyakan = $dbs->query($sql_total_teknik_perminyakan);
-    $teknik_perminyakan      = $total_teknik_perminyakan->fetch_object();
-    $get_teknik_perminyakan = $teknik_perminyakan->total;
-
-    // get total ilmu_komputer
-    $sql_total_teknik_elektro = 'SELECT  COUNT(member_id) AS total  FROM '.$table_spec.' WHERE m.major=\'Teknik Elektro\' AND '.$criteria;
-    $total_teknik_elektro = $dbs->query($sql_total_teknik_elektro);
-    $teknik_elektro      = $total_teknik_elektro->fetch_object();
-    $get_teknik_elektro = $teknik_elektro->total;
-
-    // get total ilmu_komputer
-    $sql_total_teknik_mesin = 'SELECT  COUNT(member_id) AS total  FROM '.$table_spec.' WHERE m.major=\'Teknik Mesin\' AND '.$criteria;
-    $total_teknik_mesin = $dbs->query($sql_total_teknik_mesin);
-    $teknik_mesin      = $total_teknik_mesin->fetch_object();
-    $get_teknik_mesin = $teknik_mesin->total;
-
-    // get total ilmu_komputer
-    $sql_total_teknik_kimia = 'SELECT  COUNT(member_id) AS total  FROM '.$table_spec.' WHERE m.major=\'Teknik Kimia\' AND '.$criteria;
-    $total_teknik_kimia = $dbs->query($sql_total_teknik_kimia);
-    $teknik_kimia      = $total_teknik_kimia->fetch_object();
-    $get_teknik_kimia = $teknik_kimia->total;
-
-    // get total ilmu_komputer
-    $sql_total_teknik_logistik = 'SELECT  COUNT(member_id) AS total  FROM '.$table_spec.' WHERE m.major=\'Teknik Logistik\' AND '.$criteria;
-    $total_teknik_logistik = $dbs->query($sql_total_teknik_logistik);
-    $teknik_logistik      = $total_teknik_logistik->fetch_object();
-    $get_teknik_logistik = $teknik_logistik->total;
-
-    // get total ilmu_komputer
-    $sql_total_teknik_sipil = 'SELECT  COUNT(member_id) AS total  FROM '.$table_spec.' WHERE m.major=\'Teknik Sipil\' AND '.$criteria;
-    $total_teknik_sipil = $dbs->query($sql_total_teknik_sipil);
-    $teknik_sipil      = $total_teknik_sipil->fetch_object();
-    $get_teknik_sipil = $teknik_sipil->total;
-
-    // get total ilmu_komputer
-    $sql_total_teknik_lingkungan = 'SELECT  COUNT(member_id) AS total  FROM '.$table_spec.' WHERE m.major=\'Teknik Lingkungan\' AND '.$criteria;
-    $total_teknik_lingkungan = $dbs->query($sql_total_teknik_lingkungan);
-    $teknik_lingkungan      = $total_teknik_lingkungan->fetch_object();
-    $get_teknik_lingkungan = $teknik_lingkungan->total;
-
-    // get total ilmu_komputer
-    $sql_total_ilmu_komputer = 'SELECT  COUNT(member_id) AS total  FROM '.$table_spec.' WHERE m.major=\'"ilmu komputer"\' AND '.$criteria;
-    $total_ilmu_komputer = $dbs->query($sql_total_ilmu_komputer);
-    $ilmu_komputer      = $total_ilmu_komputer->fetch_object();
-    $get_ilmu_komputer = $ilmu_komputer->total;
-
-    // get total ilmu_komputer
-    $sql_total_ilmu_komputer = 'SELECT  COUNT(member_id) AS total  FROM '.$table_spec.' WHERE m.major=\'"ilmu komputer"\' AND '.$criteria;
-    $total_ilmu_komputer = $dbs->query($sql_total_ilmu_komputer);
-    $ilmu_komputer      = $total_ilmu_komputer->fetch_object();
-    $get_ilmu_komputer = $ilmu_komputer->total;
-
-    // get total ilmu_komputer
-    $sql_total_ilmu_komputer = 'SELECT  COUNT(member_id) AS total  FROM '.$table_spec.' WHERE m.major=\'"ilmu komputer"\' AND '.$criteria;
-    $total_ilmu_komputer = $dbs->query($sql_total_ilmu_komputer);
-    $ilmu_komputer      = $total_ilmu_komputer->fetch_object();
-    $get_ilmu_komputer = $ilmu_komputer->total;
-
-    // get total ilmu_komputer
-    $sql_total_ilmu_komputer = 'SELECT  COUNT(member_id) AS total  FROM '.$table_spec.' WHERE m.major=\'"ilmu komputer"\' AND '.$criteria;
-    $total_ilmu_komputer = $dbs->query($sql_total_ilmu_komputer);
-    $ilmu_komputer      = $total_ilmu_komputer->fetch_object();
-    $get_ilmu_komputer = $ilmu_komputer->total;
-
-    // get total ilmu_komputer
-    $sql_total_ilmu_komputer = 'SELECT  COUNT(member_id) AS total  FROM '.$table_spec.' WHERE m.major=\'"ilmu komputer"\' AND '.$criteria;
-    $total_ilmu_komputer = $dbs->query($sql_total_ilmu_komputer);
-    $ilmu_komputer      = $total_ilmu_komputer->fetch_object();
-    $get_ilmu_komputer = $ilmu_komputer->total;
-
-    // get total ilmu_komputer
-    $sql_total_ilmu_komputer = 'SELECT  COUNT(member_id) AS total  FROM '.$table_spec.' WHERE m.major=\'"ilmu komputer"\' AND '.$criteria;
-    $total_ilmu_komputer = $dbs->query($sql_total_ilmu_komputer);
-    $ilmu_komputer      = $total_ilmu_komputer->fetch_object();
-    $get_ilmu_komputer = $ilmu_komputer->total;
+    function total_data($major,$table_spec,$criteria,$dbs){
+    $sql_data = 'SELECT  COUNT(member_id) AS total  FROM '.$table_spec.' WHERE m.major=\''.$major.'\' AND '.$criteria;
+    $total_sql_data = $dbs->query($sql_data);
+    $total_sql_data      = $total_sql_data->fetch_object();
+    $get_total_sql_data = $total_sql_data->total;
+    return $get_total_sql_data;
+    }
 
 
 ?>
@@ -316,7 +234,7 @@ if (!$reportView) {
                         <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#C0CA33;"></i> Management</div>
                         <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#6D4C41;"></i> Ekonomi</div>
                         <?php } if ($_GET['faculty']==6 OR $_GET['faculty']==0) { ?>
-                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#039BE5;"></i> Komunikasi</div>
+                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#039BE5;"></i> Ilmu Komunikasi</div>
                         <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#D81B60;"></i> Hubungan Internasional</div>
                         <?php } ?>
                     </div>
@@ -341,68 +259,68 @@ $(function(){
             <?php if ($_GET['faculty']==1 OR $_GET['faculty']==0) { ?>
             {
               fillColor : "#f2f2f2",
-              data : [<?php echo $get_teknik_geofisika;?>]
+              data : [<?php echo total_data("Teknik Geofisika",$table_spec,$criteria,$dbs);?>]
             },{
               fillColor : "#459CBD",
-              data : [<?php echo $get_teknik_geologi;?>]
+              data : [<?php echo total_data("Teknik Geologi",$table_spec,$criteria,$dbs);?>]
             },{
                 fillColor : "#5D45BD",
-                data : [<?php echo $get_teknik_geofisika;?>]
+                data : [<?php echo total_data("Teknik Perminyakan",$table_spec,$criteria,$dbs);?>]
             
             },
             <?php } if ($_GET['faculty']==2 OR $_GET['faculty']==0) { ?>
             {
                 fillColor : "#3949AB",
-                data : [<?php echo $get_teknik_geofisika;?>]
+                data : [<?php echo total_data("Teknik Elektro",$table_spec,$criteria,$dbs);?>]
             
             },{
                 fillColor : "#27ae60",
-                data : [<?php echo $get_teknik_geofisika;?>]
+                data : [<?php echo total_data("Teknik Mesin",$table_spec,$criteria,$dbs);?>]
             
             },{
                 fillColor : "#2980b9",
-                data : [<?php echo $get_teknik_geofisika;?>]
+                data : [<?php echo total_data("Teknik Kimia",$table_spec,$criteria,$dbs);?>]
             
             },{
                 fillColor : "#8e44ad",
-                data : [<?php echo $get_teknik_geofisika;?>]
+                data : [<?php echo total_data("Teknik Logistik",$table_spec,$criteria,$dbs);?>]
             
             },
             <?php } if ($_GET['faculty']==4 OR $_GET['faculty']==0) { ?>
             {
                 fillColor : "#2c3e50",
-                data : [<?php echo $get_teknik_geofisika;?>]
+                data : [<?php echo total_data("Teknik Sipil",$table_spec,$criteria,$dbs);?>]
             
             },{
                 fillColor : "#f39c12",
-                data : [<?php echo $get_teknik_geofisika;?>]
+                data : [<?php echo total_data("Teknik Lingkungan",$table_spec,$criteria,$dbs);?>]
             
             },
             <?php } if ($_GET['faculty']==5 OR $_GET['faculty']==0) { ?>
             {
                 fillColor : "#d35400",
-                data : [<?php echo $get_ilmu_komputer;?>]
+                data : [<?php echo total_data("Ilmu Komputer",$table_spec,$criteria,$dbs);?>]
             
             },{
                 fillColor : "#c0392b",
-                data : [<?php echo $get_teknik_geofisika;?>]
+                data : [<?php echo total_data("Ilmu Kimia",$table_spec,$criteria,$dbs);?>]
             
             },
             <?php } if ($_GET['faculty']==3 OR $_GET['faculty']==0) { ?>
             {
                 fillColor : "#C0CA33",
-                data : [<?php echo $get_teknik_geofisika;?>]
+                data : [<?php echo total_data("Management",$table_spec,$criteria,$dbs)?>]
             },{
                 fillColor : "#6D4C41",
-                data : [<?php echo $get_teknik_geofisika;?>]
+                data : [<?php echo total_data("Ekonomi",$table_spec,$criteria,$dbs);?>]
             },
             <?php } if ($_GET['faculty']==6 OR $_GET['faculty']==0) { ?>
             {
                 fillColor : "#039BE5",
-                data : [<?php echo $get_teknik_geofisika;?>]
+                data : [<?php echo total_data("Ilmu Komunikasi",$table_spec,$criteria,$dbs);?>]
             },{
                 fillColor : "#D81B60",
-                data : [<?php echo $get_teknik_geofisika;?>]
+                data : [<?php echo total_data("Hubungan Internasional",$table_spec,$criteria,$dbs);?>]
             }
             <?php } ?>
         ]
