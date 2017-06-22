@@ -19,7 +19,7 @@
 <div class="s-visitor container">
     <header>
         <h1>Visitor Counter</h1>
-        <div class="info">Please tap your RFID card</div>
+        <div class="info"><?php echo __('Please tap your RFID card'); ?></div>
         <div class="row">
         </div>
     </header>

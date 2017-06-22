@@ -61,7 +61,7 @@ if (!$reportView) {
     <!-- filter -->
     <fieldset>
     <div class="per_title">
-      <h2><?php echo __('Member List Active'); ?></h2>
+      <h2><?php echo __('Summary Member List Active'); ?></h2>
     </div>
     <div class="infoBox">
     <?php echo __('Report Filter'); ?>
@@ -122,8 +122,8 @@ if (!$reportView) {
             <div class="divRowLabel"><?php echo __('Generation'); ?></div>
             <div class="divRowContent">
             <?php
-                $generation_options[] = array(2016,'2016');
-                $generation_options[] = array(2017,'2017');
+                $generation_options[] = array(16,'2016');
+                $generation_options[] = array(17,'2017');
             echo simbio_form_element::selectList('generation', $generation_options);
             ?>
             </div>
@@ -132,8 +132,8 @@ if (!$reportView) {
             <div class="divRowLabel"><?php echo __('Major'); ?></div>
             <div class="divRowContent">
             <?php
-                $major_options[] = array('Ilmu Komputer','Ilmu Komputer');
-                $major_options[] = array('Ilmu Kimia','Ilmu Kimia');
+                $major_options[] = array(52,'Ilmu Komputer');
+                $major_options[] = array(51,'Ilmu Kimia');
             echo simbio_form_element::selectList('major', $major_options);
             ?>
             </div>
@@ -158,13 +158,37 @@ if (!$reportView) {
 } else {
 
     ob_start();
+function kode_angkatan($id)
+{
+    $id=substr($id,4,2);
+    return "20".$id;
+}
+function kode_prodi($id)
+{
+    $id=substr($id,2,2);
+    return $id;
+}
+function nama_prodi($id)
+{   switch ($id) {
+        case 52:
+            $id="Ilmu Komputer";
+            break;
+        case 51:
+            $id="Ilmu Kimia";
+            break;
+        default:
+            $id="tidak ada";
+            break;
+    }
+    return $id;
+}
     // table spec
     $table_spec = 'member AS m
         LEFT JOIN mst_member_type AS mt ON m.member_type_id=mt.member_type_id';
 
     // create datagrid
     $reportgrid = new report_datagrid();
-    $reportgrid->setSQLColumn('m.generation AS \''.__('Generation').'\'','m.major AS \''.__('Major').'\'','m.member_id AS \''.__('Member ID').'\'',
+    $reportgrid->setSQLColumn('substr(m.member_id,5,2) AS \''.__('Generation').'\'','substr(m.member_id,3,2) AS \''.__('Major').'\'','m.member_id AS \''.__('Member ID').'\'',
         'm.member_name AS \''.__('Member Name').'\'',
         'mt.member_type_name AS \''.__('Membership Type').'\'',
         'm.member_since_date AS \''.__('Membership Since').'\'');
@@ -191,12 +215,12 @@ if (!$reportView) {
     //more generation
         if (isset($_GET['generation']) AND !empty($_GET['generation'])) {
         $generation = $dbs->escape_string(trim($_GET['generation']));
-        $criteria .= ' AND m.generation=\''.$generation.'\'';    
+        $criteria .= ' AND substr(m.member_id,5,2)=\''.$generation.'\'';    
     }
     //more generation
         if (isset($_GET['major']) AND !empty($_GET['major'])) {
         $major = $dbs->escape_string(trim($_GET['major']));
-        $criteria .= ' AND m.major=\''.$major.'\'';  
+        $criteria .= ' AND substr(m.member_id,3,2)=\''.$major.'\'';  
     }
     // register date
     if (isset($_GET['startDate']) AND isset($_GET['untilDate'])) {

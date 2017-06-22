@@ -32,6 +32,7 @@ $menu[] = array(__('Items Usage Statistics'), MWB.'reporting/customs/item_usage.
 $menu[] = array(__('Loans by Classification'), MWB.'reporting/customs/loan_by_class.php', __('Loan statistic by classification'));
 $menu[] = array(__('Member List'), MWB.'reporting/customs/member_list.php', __('List of library member/patron'));
 $menu[] = array(__('Member List Active'), MWB.'reporting/customs/member_activ_list.php', __('List of library Member Active'));
+$menu[] = array(__('Summary Member Active'), MWB.'reporting/customs/summary_member_activ.php', __('Summary of library Member Active'));
 $menu[] = array(__('Loan List by Member'), MWB.'reporting/customs/member_loan_list.php', __('List of loan by each member'));
 $menu[] = array(__('Loan History'), MWB.'reporting/customs/loan_history.php', __('Loan History Overview'));
 $menu[] = array(__('Due Date Warning'), MWB.'reporting/customs/due_date_warning.php', __('Loan Due Date Warnings'));
