@@ -26,7 +26,7 @@ do_checkIP('smc-bibliography');
 
 $menu[] = array('Header', __('Bibliographic'));
 $menu[] = array(__('Bibliographic List'), MWB.'bibliography/index.php', __('Show Existing Bibliographic Data'));
-$menu[] = array(__('Add New Bibliography'), MWB.'bibliography/index.php?action=detail', __('Add New Bibliographic Data/Catalog'));
+//$menu[] = array(__('Add New Bibliography'), MWB.'bibliography/index.php?action=detail', __('Add New Bibliographic Data/Catalog'));
 $menu[] = array('Header', __('Items'));
 $menu[] = array(__('Item List'), MWB.'bibliography/item.php', __('Show List of Library Items'));
 $menu[] = array(__('Checkout Items'), MWB.'bibliography/checkout_item.php', __('Show List of Checkout Items'));
