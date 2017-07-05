@@ -26,7 +26,7 @@
     <form action="index.php?p=visitor" name="visitorCounterForm" id="visitorCounterForm" method="post" style="padding-top:50px;">
         <div class="row">
             <div class="col-lg-12 col-sm-12 col-xs-12">
-                <input type="text" name="memberid" id="memberid" class="form-control input-lg" onkeypress="return runScript(event)"/>
+                <input type="text" name="memberid" id="memberid" class="form-control input-lg" autofocus="autofocus" onkeypress="return runScript(event)"/>
                 <label for="locker">Your ID card should writed in there</label>
             </div>
         </div>
@@ -41,31 +41,34 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title" style="color:white">Visitor Detail</h4>
             </div>
-	        <div class="modal-body" style="color:black">
-                <div class="row" style="margin:10px;">
-                    <table>
-                          <tr>
-                            <th style="background-color: #1abc9c;color: white;width:30%;border-bottom: 0.5px solid #1ae0b9;"><h5>Member ID</h5></th>
-                            <th><h5 id="memberid2">105216053</h5></th>
-                          </tr>
-                          <tr>
-                            <th style="background-color: #1abc9c;color: white;border-bottom: 1px solid #1ae0b9;"><h5>Nama</h5></th>
-                            <th><h5 id="name">Megandi</h5></th>
-                          </tr>
-                          <tr>
-                            <th style="background-color: #1abc9c;color: white;border-bottom: 1px solid #1ae0b9;"><h5>Member's Email</h5></th>
-                            <th style="border-bottom: 1px solid #ddd;"><h5 id="email">Standart</h5></th>
-                          </tr>
-                          <tr>
-                            <th style="background-color: #1abc9c;color: white;border-bottom: 1px solid #1ae0b9;"><h5>Number Locker</h5></th>
-                            <th style="border-bottom: 1px solid #ddd;"><input type="text" class="form-control input-md" onkeypress="return runScript(event)"/></th>
-                          </tr>
-                    </table>
-                </div>
-	        </div>
+          <form method="POST" action="template/default/visitor_template_prosesadd.php">
+  	        <div class="modal-body" style="color:black">
+                  <div class="row" style="margin:10px;">
+                      <table>
+                            <tr>
+                              <th style="background-color: #1abc9c;color: white;width:30%;border-bottom: 0.5px solid #1ae0b9;"><h5>Member ID</h5></th>
+                              <th><h5 id="memberid2">105216053</h5></th>
+                              <input type="hidden" name="memberid" id="memberid3">
+                            </tr>
+                            <tr>
+                              <th style="background-color: #1abc9c;color: white;border-bottom: 1px solid #1ae0b9;"><h5>Nama</h5></th>
+                              <th><h5 id="name">Megandi</h5></th>
+                            </tr>
+                            <tr>
+                              <th style="background-color: #1abc9c;color: white;border-bottom: 1px solid #1ae0b9;"><h5>Member's Email</h5></th>
+                              <th style="border-bottom: 1px solid #ddd;"><h5 id="email">Standart</h5></th>
+                            </tr>
+                            <tr>
+                              <th style="background-color: #1abc9c;color: white;border-bottom: 1px solid #1ae0b9;"><h5>Activites</h5></th>
+                              <th style="border-bottom: 1px solid #ddd;"><input type="text" id="activitiess" autofocus name="activities" class="form-control input-md"/></th>
+                            </tr>
+                      </table>
+                  </div>
+  	        </div>
             <div class="modal-footer">
-                <button id="submit" class="btn btn-primary">Save Locker</button>
+                <input type="submit" class="btn btn-primary" value="Save">
             </div>
+          </form>
         </div>
     </div>
 </div>

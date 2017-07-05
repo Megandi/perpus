@@ -191,12 +191,12 @@ if (!$reportView) {
     //more generation
         if (isset($_GET['generation']) AND !empty($_GET['generation'])) {
         $generation = $dbs->escape_string(trim($_GET['generation']));
-        $criteria .= ' AND m.generation=\''.$generation.'\'';    
+        $criteria .= ' AND m.generation=\''.$generation.'\'';
     }
     //more generation
         if (isset($_GET['major']) AND !empty($_GET['major'])) {
         $major = $dbs->escape_string(trim($_GET['major']));
-        $criteria .= ' AND m.major=\''.$major.'\'';  
+        $criteria .= ' AND m.major=\''.$major.'\'';
     }
     // register date
     if (isset($_GET['startDate']) AND isset($_GET['untilDate'])) {
