@@ -106,19 +106,25 @@ if (!$reportView) {
             <div class="divRowLabel"><?php echo __('Generation'); ?></div>
             <div class="divRowContent">
             <?php
-                $generation_options[] = array(16,'2016');
-                $generation_options[] = array(17,'2017');
+                $generation_options[] = array(1,'ALL');
+                $generation_options[] = array(2016,'2016');
+                $generation_options[] = array(2017,'2017');
             echo simbio_form_element::selectList('generation', $generation_options);
             ?>
             </div>
         </div>
         <div class="divRow">
-            <div class="divRowLabel"><?php echo __('Major'); ?></div>
+            <div class="divRowLabel"><?php echo __('Faculty'); ?></div>
             <div class="divRowContent">
             <?php
-                $major_options[] = array(52,'Ilmu Komputer');
-                $major_options[] = array(51,'Ilmu Kimia');
-            echo simbio_form_element::selectList('major', $major_options);
+                $faculty_options[] = array(0,'ALL');
+                $faculty_options[] = array(1,'Fakultas Teknologi Eksplorasi dan Produksi');
+                $faculty_options[] = array(2,'Fakultas Teknologi Industri');
+                $faculty_options[] = array(3,'Fakultas Management dan Bisnis');
+                $faculty_options[] = array(4,'Fakultas Perencanaan infrastruktur');
+                $faculty_options[] = array(5,'Fakultas Sains dan Komputer');
+                $faculty_options[] = array(6,'Fakultas Komunikasi dan Diplomasi');
+            echo simbio_form_element::selectList('faculty', $faculty_options);
             ?>
             </div>
         </div>
@@ -151,100 +157,46 @@ if (!$reportView) {
   <script type="text/javascript" src="<?php echo JWB; ?>jquery.js"></script>
 <?php
     // generate dashboard content
-    $get_date       = '';
-    $get_loan       = '';
-    $get_return     = '';
-    $get_extends    = '';
-    $start_date     = '111'; // set date from TODAY
+     $start_date    = date("F j, Y");  
+
+    $table_spec = 'member AS m
+        LEFT JOIN mst_member_type AS mt ON m.member_type_id=mt.member_type_id';
+    $criteria = 'm.member_id IS NOT NULL AND TO_DAYS(expire_date)>TO_DAYS(\''.date('Y-m-d').'\')';
+    if (isset($_GET['member_type']) AND !empty($_GET['member_type'])) {
+        $mtype = intval($_GET['member_type']);
+        $criteria .= ' AND m.member_type_id='.$mtype;
+ // set date from TODAY
+    }
+    if (isset($_GET['gender']) AND $_GET['gender'] != 'ALL') {
+        $gender = intval($_GET['gender']);
+        $criteria .= ' AND m.gender='.$gender;
+    }
+    //more generation
+        if (isset($_GET['generation']) AND !empty($_GET['generation']) AND $_GET['generation']!=1) {
+        $generation = $dbs->escape_string(trim($_GET['generation']));
+        $criteria .= ' AND m.generation=\''.$generation.'\'';  
+    }
+    // register date
+    if (isset($_GET['startDate']) AND isset($_GET['untilDate'])) {
+        $criteria .= ' AND (TO_DAYS(m.register_date) BETWEEN TO_DAYS(\''.$_GET['startDate'].'\') AND
+            TO_DAYS(\''.$_GET['untilDate'].'\'))';
+                    $startDate=date_create($_GET['startDate']);
+        $startDate=date_format($startDate,"F j, Y");
+        $untilDate=date_create($_GET['untilDate']);
+        $untilDate=date_format($untilDate,"F j, Y");
+            $start_date     = $startDate.' - '.$untilDate;
+    }
 
     // get total ilmu_komputer
-    $sql_total_ilmu_komputer = ' SELECT 
-                            COUNT(member_id) AS total
-                        FROM 
-                            member';
-    $total_ilmu_komputer = $dbs->query($sql_total_ilmu_komputer);
-    $ilmu_komputer      = $total_ilmu_komputer->fetch_object();
-    $get_ilmu_komputer = $ilmu_komputer->total;
+    function total_data($major,$table_spec,$criteria,$dbs){
+    $sql_data = 'SELECT  COUNT(member_id) AS total  FROM '.$table_spec.' WHERE m.major=\''.$major.'\' AND '.$criteria;
+    $total_sql_data = $dbs->query($sql_data);
+    $total_sql_data      = $total_sql_data->fetch_object();
+    $get_total_sql_data = $total_sql_data->total;
+    return $get_total_sql_data;
+    }
 
-    // return transaction date
-    $get_date       = $start_date;
-    $get_return     = substr($get_return,0,-1);
-    $get_extends    = substr($get_extends,0,-1);
 
-    // get total summary
-    $sql_total_coll = ' SELECT 
-                            COUNT(loan_id) AS total
-                        FROM 
-                            loan';
-    $total_coll = $dbs->query($sql_total_coll);
-    $total      = $total_coll->fetch_object();
-    $get_total  = $total->total;
-
-    // get loan summary
-    $sql_loan_coll = ' SELECT 
-                            COUNT(loan_id) AS total
-                        FROM 
-                            loan
-                        WHERE
-                            is_lent = 1
-                            AND is_return = 0';
-    $total_loan         = $dbs->query($sql_loan_coll);
-    $loan               = $total_loan->fetch_object();
-    $get_total_loan     = $loan->total;
-
-    // get return summary
-    $sql_return_coll = ' SELECT 
-                            COUNT(loan_id) AS total
-                        FROM 
-                            loan
-                        WHERE
-                            is_lent = 1
-                            AND is_return = 1';
-    $total_return         = $dbs->query($sql_return_coll);
-    $return               = $total_return->fetch_object();
-    $get_total_return     = $return->total;
-
-    // get extends summary
-    $sql_extends_coll = ' SELECT 
-                            COUNT(loan_id) AS total
-                        FROM 
-                            loan
-                        WHERE
-                            is_lent = 1
-                            AND renewed = 1
-                            AND is_return = 0';
-    $total_extends         = $dbs->query($sql_extends_coll);
-    $renew                 = $total_extends->fetch_object();
-    $get_total_extends     = $renew->total;
-
-    // get overdue
-    $sql_overdue_coll = ' SELECT 
-                            COUNT(fines_id) AS total
-                        FROM 
-                            fines';
-    $total_overdue         = $dbs->query($sql_overdue_coll);
-    $overdue               = $total_overdue->fetch_object();
-    $get_total_overdue     = $overdue->total;
-
-    // get titles
-    $sql_title_coll = ' SELECT 
-                            COUNT(biblio_id) AS total
-                        FROM 
-                            biblio';
-    $total_title         = $dbs->query($sql_title_coll);
-    $title               = $total_title->fetch_object();
-    $get_total_title     = number_format($title->total,0,'.',',');
-
-    // get item
-    $sql_item_coll = ' SELECT 
-                            COUNT(item_id) AS total
-                        FROM 
-                            item';
-    $total_item          = $dbs->query($sql_item_coll);
-    $item                = $total_item->fetch_object();
-    $get_total_item      = number_format($item->total,0,'.',',');
-    $get_total_available = $item->total - $get_total_loan;
-    $get_total_available = number_format($get_total_available,0,'.',',');
 ?>
 <div class="contentDesc">    
     <div class="container-fluid">
@@ -252,16 +204,35 @@ if (!$reportView) {
             <div class="col-lg-12 s-dashboard">
               <div class="panel panel-info">
                 <div class="panel-heading">
-                  <h2 class="panel-title"><?php echo __('Latest Transactions') ?></h2>
+                  <h2 class="panel-title"><?php echo $start_date; ?></h2>
                 </div>
                 <div class="panel-body">
                     <canvas id="line-chartjs" height="319"></canvas>            
                 </div>
                 <div class="panel-footer">
                     <div class="s-dashboard-legend" align="left">
-                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#f2f2f2;"></i> <?php echo __('Ilmu Komputer') ?></div>
-                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#459CBD;"></i> <?php echo __('Ilmu Kimia') ?></div>
-                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#5D45BD;"></i> <?php echo __('T. Geofisika') ?></div>
+                        <?php if ($_GET['faculty']==1 OR $_GET['faculty']==0) { ?>
+                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#f2f2f2;"></i> Teknik Geofisika</div>
+                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#459CBD;"></i> Teknik Geologi</div>
+                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#5D45BD;"></i> Teknik Perminyakan</div>
+                        <?php } if ($_GET['faculty']==2 OR $_GET['faculty']==0) { ?>
+                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#3949AB;"></i> Teknik Elektro</div>
+                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#27ae60;"></i> Teknik Mesin</div>
+                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#2980b9;"></i> Teknik Kimia</div>
+                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#8e44ad;"></i> Teknik Logistik</div>
+                        <?php } if ($_GET['faculty']==4 OR $_GET['faculty']==0) { ?>
+                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#2c3e50;"></i> Teknik Sipil</div>
+                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#f39c12;"></i> Teknik Lingkungan</div>
+                        <?php } if ($_GET['faculty']==5 OR $_GET['faculty']==0) { ?>
+                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#d35400;"></i> Ilmu Komputer</div>
+                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#c0392b;"></i> Ilmu Kimia</div>
+                        <?php } if ($_GET['faculty']==3 OR $_GET['faculty']==0) { ?>
+                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#C0CA33;"></i> Management</div>
+                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#6D4C41;"></i> Ekonomi</div>
+                        <?php } if ($_GET['faculty']==6 OR $_GET['faculty']==0) { ?>
+                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#039BE5;"></i> Ilmu Komunikasi</div>
+                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#D81B60;"></i> Hubungan Internasional</div>
+                        <?php } ?>
                     </div>
                 </div>
               </div>
@@ -278,19 +249,76 @@ if (!$reportView) {
 <script>
 $(function(){  
     var lineChartData = {
-      labels : [<?php echo $get_date?>],
+        labels : ['Member Aktif'],
       datasets : 
         [
+            <?php if ($_GET['faculty']==1 OR $_GET['faculty']==0) { ?>
             {
               fillColor : "#f2f2f2",
-              data : [<?php echo $get_ilmu_komputer?>]
+              data : [<?php echo total_data("Teknik Geofisika",$table_spec,$criteria,$dbs);?>]
             },{
               fillColor : "#459CBD",
-              data : [5]
+              data : [<?php echo total_data("Teknik Geologi",$table_spec,$criteria,$dbs);?>]
             },{
                 fillColor : "#5D45BD",
-                data : [9]
+                data : [<?php echo total_data("Teknik Perminyakan",$table_spec,$criteria,$dbs);?>]
+            
+            },
+            <?php } if ($_GET['faculty']==2 OR $_GET['faculty']==0) { ?>
+            {
+                fillColor : "#3949AB",
+                data : [<?php echo total_data("Teknik Elektro",$table_spec,$criteria,$dbs);?>]
+            
+            },{
+                fillColor : "#27ae60",
+                data : [<?php echo total_data("Teknik Mesin",$table_spec,$criteria,$dbs);?>]
+            
+            },{
+                fillColor : "#2980b9",
+                data : [<?php echo total_data("Teknik Kimia",$table_spec,$criteria,$dbs);?>]
+            
+            },{
+                fillColor : "#8e44ad",
+                data : [<?php echo total_data("Teknik Logistik",$table_spec,$criteria,$dbs);?>]
+            
+            },
+            <?php } if ($_GET['faculty']==4 OR $_GET['faculty']==0) { ?>
+            {
+                fillColor : "#2c3e50",
+                data : [<?php echo total_data("Teknik Sipil",$table_spec,$criteria,$dbs);?>]
+            
+            },{
+                fillColor : "#f39c12",
+                data : [<?php echo total_data("Teknik Lingkungan",$table_spec,$criteria,$dbs);?>]
+            
+            },
+            <?php } if ($_GET['faculty']==5 OR $_GET['faculty']==0) { ?>
+            {
+                fillColor : "#d35400",
+                data : [<?php echo total_data("Ilmu Komputer",$table_spec,$criteria,$dbs);?>]
+            
+            },{
+                fillColor : "#c0392b",
+                data : [<?php echo total_data("Ilmu Kimia",$table_spec,$criteria,$dbs);?>]
+            
+            },
+            <?php } if ($_GET['faculty']==3 OR $_GET['faculty']==0) { ?>
+            {
+                fillColor : "#C0CA33",
+                data : [<?php echo total_data("Management",$table_spec,$criteria,$dbs)?>]
+            },{
+                fillColor : "#6D4C41",
+                data : [<?php echo total_data("Ekonomi",$table_spec,$criteria,$dbs);?>]
+            },
+            <?php } if ($_GET['faculty']==6 OR $_GET['faculty']==0) { ?>
+            {
+                fillColor : "#039BE5",
+                data : [<?php echo total_data("Ilmu Komunikasi",$table_spec,$criteria,$dbs);?>]
+            },{
+                fillColor : "#D81B60",
+                data : [<?php echo total_data("Hubungan Internasional",$table_spec,$criteria,$dbs);?>]
             }
+            <?php } ?>
         ]
     }
 
