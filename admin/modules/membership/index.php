@@ -146,7 +146,9 @@ if (isset($_POST['saveData']) AND $can_read AND $can_write) {
         $data['member_fax'] = trim($dbs->escape_string(strip_tags($_POST['memberFax'])));
         $data['postal_code'] = trim($dbs->escape_string(strip_tags($_POST['memberPostal'])));
         $data['member_notes'] = trim($dbs->escape_string(strip_tags($_POST['memberNotes'])));
-        $data['member_email'] = trim($dbs->escape_string(strip_tags($_POST['memberEmail'])));
+        $data['member_email'] = trim($dbs->escape_string(strip_tags($_POST['member_email'])));
+        $data['generation'] = trim($dbs->escape_string(strip_tags($_POST['generation'])));
+        $data['major'] = trim($dbs->escape_string(strip_tags($_POST['major'])));
         $data['is_pending'] = isset($_POST['isPending'])? intval($_POST['isPending']) : '0';
         $data['input_date'] = date('Y-m-d');
         $data['last_update'] = date('Y-m-d');
@@ -414,11 +416,36 @@ if (isset($_POST['detail']) OR (isset($_GET['action']) AND $_GET['action'] == 'd
     }
     // member institution
     $form->addTextField('text', 'instName', __('Institution'), $rec_d['inst_name'], 'style="width: 100%;"');
+        // Major
+    $major_options[] = array('','None');
+    $major_options[] = array('Teknik Geofisika','Teknik Geofisika');
+    $major_options[] = array('Teknik Geologi','Teknik Geologi');
+    $major_options[] = array('Teknik Perminyakan','Teknik Perminyakan');
+    $major_options[] = array('Teknik Elektro','Teknik Elektro');
+    $major_options[] = array('Teknik Mesin','Teknik Mesin');
+    $major_options[] = array('Teknik Kimia','Teknik Kimia');
+    $major_options[] = array('Teknik Logistik','Teknik Logistik');
+    $major_options[] = array('Teknik Sipil','Teknik Sipil');
+    $major_options[] = array('Teknik Lingkungan','Teknik Lingkungan');
+    $major_options[] = array('Ilmu Komputer','Ilmu Komputer');
+    $major_options[] = array('Ilmu Kimia','Ilmu Kimia');
+    $major_options[] = array('Management','Management');
+    $major_options[] = array('Ekonomi','Ekonomi');
+    $major_options[] = array('Ilmu Komunikasi','Ilmu Komunikasi');
+    $major_options[] = array('Hubungan Internasional','Hubungan Internasional');
+    $form->addSelectList('major', __('Major'), $major_options, !empty($rec_d['major'])?$rec_d['major']:'0');
+    // Generation
+    $generation_chbox[] = array('','None');
+    for($i=2016; $i<=date('Y'); $i++){
+          $generation_chbox[] = array($i, $i);  
+    }
+    $form->addSelectList('generation', __('Generation'), $generation_chbox, $rec_d['generation']);
     // member type
         // get mtype data related to this record from database
         $mtype_query = $dbs->query("SELECT member_type_id, member_type_name FROM mst_member_type");
         $mtype_options = array();
         while ($mtype_data = $mtype_query->fetch_row()) {
+
             $mtype_options[] = array($mtype_data[0], $mtype_data[1]);
         }
     $form->addSelectList('memberTypeID', __('Membership Type').'*', $mtype_options, $rec_d['member_type_id']);

@@ -135,7 +135,7 @@ if (!$reportView) {
     <input type="hidden" name="reportView" value="true" />
     </div>
     </form>
-	</div>
+    </div>
     </fieldset>
     <!-- filter end -->
     <div class="dataListHeader" style="padding: 3px;"><span id="pagingBox"></span></div>
@@ -161,7 +161,7 @@ if (!$reportView) {
 
     $table_spec = 'member AS m
         LEFT JOIN mst_member_type AS mt ON m.member_type_id=mt.member_type_id';
-    $criteria = 'm.member_id IS NOT NULL AND TO_DAYS(expire_date)>TO_DAYS(\''.date('Y-m-d').'\')';
+    $criteria = 'm.member_id IS NOT NULL';
     if (isset($_GET['member_type']) AND !empty($_GET['member_type'])) {
         $mtype = intval($_GET['member_type']);
         $criteria .= ' AND m.member_type_id='.$mtype;
@@ -189,7 +189,14 @@ if (!$reportView) {
 
     // get total ilmu_komputer
     function total_data($major,$table_spec,$criteria,$dbs){
-    $sql_data = 'SELECT  COUNT(member_id) AS total  FROM '.$table_spec.' WHERE m.major=\''.$major.'\' AND '.$criteria;
+    $sql_data = 'SELECT  COUNT(member_id) AS total  FROM '.$table_spec.' WHERE m.major=\''.$major.'\'  AND TO_DAYS(expire_date)>TO_DAYS(\''.date('Y-m-d').'\') AND '.$criteria;
+    $total_sql_data = $dbs->query($sql_data);
+    $total_sql_data      = $total_sql_data->fetch_object();
+    $get_total_sql_data = $total_sql_data->total;
+    return $get_total_sql_data;
+    }
+    function total_data_not($major,$table_spec,$criteria,$dbs){
+    $sql_data = 'SELECT  COUNT(member_id) AS total  FROM '.$table_spec.' WHERE m.major=\''.$major.'\' AND TO_DAYS(expire_date)<TO_DAYS(\''.date('Y-m-d').'\') AND '.$criteria;
     $total_sql_data = $dbs->query($sql_data);
     $total_sql_data      = $total_sql_data->fetch_object();
     $get_total_sql_data = $total_sql_data->total;
@@ -212,26 +219,40 @@ if (!$reportView) {
                 <div class="panel-footer">
                     <div class="s-dashboard-legend" align="left">
                         <?php if ($_GET['faculty']==1 OR $_GET['faculty']==0) { ?>
-                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#f2f2f2;"></i> Teknik Geofisika</div>
-                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#459CBD;"></i> Teknik Geologi</div>
-                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#5D45BD;"></i> Teknik Perminyakan</div>
+                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#f2f2f2;"></i> Teknik Geofisika 
+                        (<?php echo total_data("Teknik Geofisika",$table_spec,$criteria,$dbs);?>)</div>
+                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#459CBD;"></i> Teknik Geologi
+                        (<?php echo total_data("Teknik Geologi",$table_spec,$criteria,$dbs);?>)</div>
+                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#5D45BD;"></i> Teknik Perminyakan
+                        (<?php echo total_data("Teknik Perminyakan",$table_spec,$criteria,$dbs);?>)</div>
                         <?php } if ($_GET['faculty']==2 OR $_GET['faculty']==0) { ?>
-                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#3949AB;"></i> Teknik Elektro</div>
-                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#27ae60;"></i> Teknik Mesin</div>
-                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#2980b9;"></i> Teknik Kimia</div>
-                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#8e44ad;"></i> Teknik Logistik</div>
+                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#3949AB;"></i> Teknik Elektro
+                        (<?php echo total_data("Teknik Elektro",$table_spec,$criteria,$dbs);?>)</div>
+                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#27ae60;"></i> Teknik Mesin
+                        (<?php echo total_data("Teknik Mesin",$table_spec,$criteria,$dbs);?>)</div>
+                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#2980b9;"></i> Teknik Kimia
+                        (<?php echo total_data("Teknik Kimia",$table_spec,$criteria,$dbs);?>)</div>
+                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#8e44ad;"></i> Teknik Logistik
+                        (<?php echo total_data("Teknik Logistik",$table_spec,$criteria,$dbs);?>)</div>
                         <?php } if ($_GET['faculty']==4 OR $_GET['faculty']==0) { ?>
-                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#2c3e50;"></i> Teknik Sipil</div>
-                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#f39c12;"></i> Teknik Lingkungan</div>
+                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#2c3e50;"></i> Teknik Sipil
+                        (<?php echo total_data("Teknik Sipil",$table_spec,$criteria,$dbs);?>)</div>
+                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#f39c12;"></i> Teknik Lingkungan
+                        (<?php echo total_data("Teknik Lingkungan",$table_spec,$criteria,$dbs);?>)</div>
                         <?php } if ($_GET['faculty']==5 OR $_GET['faculty']==0) { ?>
-                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#d35400;"></i> Ilmu Komputer</div>
-                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#c0392b;"></i> Ilmu Kimia</div>
+                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#d35400;"></i> Ilmu Komputer
+                        (<?php echo total_data("Ilmu Komputer",$table_spec,$criteria,$dbs);?>)</div>
+                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#c0392b;"></i> Ilmu Kimia
+                        (<?php echo total_data("Ilmu Kimia",$table_spec,$criteria,$dbs);?>)</div>
                         <?php } if ($_GET['faculty']==3 OR $_GET['faculty']==0) { ?>
-                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#C0CA33;"></i> Management</div>
-                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#6D4C41;"></i> Ekonomi</div>
+                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#C0CA33;"></i> Management
+                        (<?php echo total_data("Management",$table_spec,$criteria,$dbs);?>)</div>
+                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#6D4C41;"></i> Ekonomi
+                        (<?php echo total_data("Ekonomi",$table_spec,$criteria,$dbs);?>)</div>
                         <?php } if ($_GET['faculty']==6 OR $_GET['faculty']==0) { ?>
-                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#039BE5;"></i> Ilmu Komunikasi</div>
-                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#D81B60;"></i> Hubungan Internasional</div>
+                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#039BE5;"></i> Ilmu Komunikasi
+                        (<?php echo total_data("Ilmu Komunikasi",$table_spec,$criteria,$dbs);?>)</div>
+                        <div style="display: inline-block; margin-right: 10px;"><i class="fa fa-square" style="color:#D81B60;"></i> Hubungan Internasional (<?php echo total_data("Hubungan Internasional",$table_spec,$criteria,$dbs);?>)</div>
                         <?php } ?>
                     </div>
                 </div>
@@ -257,12 +278,20 @@ $(function(){
               fillColor : "#f2f2f2",
               data : [<?php echo total_data("Teknik Geofisika",$table_spec,$criteria,$dbs);?>]
             },{
+              fillColor : "#2c3e50",
+              data : [<?php echo total_data_not("Teknik Geofisika",$table_spec,$criteria,$dbs);?>]
+            },{
               fillColor : "#459CBD",
               data : [<?php echo total_data("Teknik Geologi",$table_spec,$criteria,$dbs);?>]
             },{
-                fillColor : "#5D45BD",
-                data : [<?php echo total_data("Teknik Perminyakan",$table_spec,$criteria,$dbs);?>]
-            
+              fillColor : "#2c3e50",
+              data : [<?php echo total_data_not("Teknik Geologi",$table_spec,$criteria,$dbs);?>]
+            },{
+              fillColor : "#5D45BD",
+              data : [<?php echo total_data("Teknik Perminyakan",$table_spec,$criteria,$dbs);?>]
+            },{
+              fillColor : "#2c3e50",
+              data : [<?php echo total_data_not("Teknik Perminyakan",$table_spec,$criteria,$dbs);?>]
             },
             <?php } if ($_GET['faculty']==2 OR $_GET['faculty']==0) { ?>
             {
@@ -270,17 +299,29 @@ $(function(){
                 data : [<?php echo total_data("Teknik Elektro",$table_spec,$criteria,$dbs);?>]
             
             },{
+              fillColor : "#2c3e50",
+              data : [<?php echo total_data_not("Teknik Elektro",$table_spec,$criteria,$dbs);?>]
+            },{
                 fillColor : "#27ae60",
                 data : [<?php echo total_data("Teknik Mesin",$table_spec,$criteria,$dbs);?>]
             
+            },{
+              fillColor : "#2c3e50",
+              data : [<?php echo total_data_not("Teknik Mesin",$table_spec,$criteria,$dbs);?>]
             },{
                 fillColor : "#2980b9",
                 data : [<?php echo total_data("Teknik Kimia",$table_spec,$criteria,$dbs);?>]
             
             },{
+              fillColor : "#2c3e50",
+              data : [<?php echo total_data_not("Teknik Kimia",$table_spec,$criteria,$dbs);?>]
+            },{
                 fillColor : "#8e44ad",
                 data : [<?php echo total_data("Teknik Logistik",$table_spec,$criteria,$dbs);?>]
             
+            },{
+              fillColor : "#2c3e50",
+              data : [<?php echo total_data_not("Teknik Logistik",$table_spec,$criteria,$dbs);?>]
             },
             <?php } if ($_GET['faculty']==4 OR $_GET['faculty']==0) { ?>
             {
@@ -288,35 +329,60 @@ $(function(){
                 data : [<?php echo total_data("Teknik Sipil",$table_spec,$criteria,$dbs);?>]
             
             },{
+              fillColor : "#2c3e50",
+              data : [<?php echo total_data_not("Teknik Sipil",$table_spec,$criteria,$dbs);?>]
+            },{
                 fillColor : "#f39c12",
                 data : [<?php echo total_data("Teknik Lingkungan",$table_spec,$criteria,$dbs);?>]
             
+            },{
+              fillColor : "#2c3e50",
+              data : [<?php echo total_data_not("Teknik Lingkungan",$table_spec,$criteria,$dbs);?>]
             },
             <?php } if ($_GET['faculty']==5 OR $_GET['faculty']==0) { ?>
             {
+                label: "Humidity",
                 fillColor : "#d35400",
                 data : [<?php echo total_data("Ilmu Komputer",$table_spec,$criteria,$dbs);?>]
             
             },{
+              fillColor : "#2c3e50",
+              data : [<?php echo total_data_not("Ilmu Komputer",$table_spec,$criteria,$dbs);?>]
+            },{
                 fillColor : "#c0392b",
                 data : [<?php echo total_data("Ilmu Kimia",$table_spec,$criteria,$dbs);?>]
             
+            },{
+              fillColor : "#2c3e50",
+              data : [<?php echo total_data_not("Ilmu Kimia",$table_spec,$criteria,$dbs);?>]
             },
             <?php } if ($_GET['faculty']==3 OR $_GET['faculty']==0) { ?>
             {
                 fillColor : "#C0CA33",
                 data : [<?php echo total_data("Management",$table_spec,$criteria,$dbs)?>]
             },{
+              fillColor : "#2c3e50",
+              data : [<?php echo total_data_not("Management",$table_spec,$criteria,$dbs);?>]
+            },{
                 fillColor : "#6D4C41",
                 data : [<?php echo total_data("Ekonomi",$table_spec,$criteria,$dbs);?>]
+            },{
+              fillColor : "#2c3e50",
+              data : [<?php echo total_data_not("Ekonomi",$table_spec,$criteria,$dbs);?>]
             },
             <?php } if ($_GET['faculty']==6 OR $_GET['faculty']==0) { ?>
             {
                 fillColor : "#039BE5",
                 data : [<?php echo total_data("Ilmu Komunikasi",$table_spec,$criteria,$dbs);?>]
             },{
+              fillColor : "#2c3e50",
+              data : [<?php echo total_data_not("Ilmu Komunikasi",$table_spec,$criteria,$dbs);?>]
+            },{
                 fillColor : "#D81B60",
                 data : [<?php echo total_data("Hubungan Internasional",$table_spec,$criteria,$dbs);?>]
+            },{
+              fillColor : "#2c3e50",
+              data : [<?php echo total_data_not("Hubungan Internasional",$table_spec,$criteria,$dbs);?>]
             }
             <?php } ?>
         ]
