@@ -25,6 +25,7 @@ if (INDEX_AUTH != 1) {
 
 /* Custom reports list */
 
+$menu[] = array(__('Transaction Details'), MWB.'reporting/customs/transaction.php', __('Transaction Details'));
 $menu[] = array(__('Custom Recapitulations'), MWB.'reporting/customs/class_recap.php', __('Title and Collection recapitulation based on classification and others'));
 $menu[] = array(__('Title List'), MWB.'reporting/customs/titles_list.php', __('List of bibliographic titles'));
 $menu[] = array(__('Items Title List'), MWB.'reporting/customs/item_titles_list.php', __('List of collection/items'));
@@ -42,4 +43,3 @@ $menu[] = array(__('Visitor Statistic'), MWB.'reporting/customs/visitor_report.p
 $menu[] = array(__('Visitor Statistic (by Day)'), MWB.'reporting/customs/visitor_report_day.php', __('Visitor Statistic (by Day)'));
 $menu[] = array(__('Visitor List'), MWB.'reporting/customs/visitor_list.php', __('Visitor List'));
 $menu[] = array(__('Fines Report'), MWB.'reporting/customs/fines_report.php', __('Fines Report'));
-
