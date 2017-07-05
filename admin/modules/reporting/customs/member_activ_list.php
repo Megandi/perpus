@@ -63,7 +63,7 @@ if (!$reportView) {
     <div class="per_title">
       <h2><?php echo __('Member List Active'); ?></h2>
     </div>
-    <div class="infoBox">
+    <div class="infoBox" >
     <?php echo __('Report Filter'); ?>
     </div>
     <div class="sub_section">
@@ -171,13 +171,39 @@ if (!$reportView) {
         </div>
         <div class="divRow">
             <div class="divRowLabel"><?php echo __('Record each page'); ?></div>
-            <div class="divRowContent"><input type="text" name="recsEachPage" size="3" maxlength="3" value="<?php echo $num_recs_show; ?>" /> <?php echo __('Set between 20 and 200'); ?></div>
+            <div class="divRowContent"><input type="text" name="recsEachPage" size="5" maxlength="5" value="<?php echo $num_recs_show; ?>" /> <?php echo __('Set between 20 and 90000'); ?></div>
         </div>
     </div>
     <div style="padding-top: 10px; clear: both;">
     <input type="button" name="moreFilter" value="<?php echo __('Show More Filter Options'); ?>" />
     <input type="submit" name="applyFilter" value="<?php echo __('Apply Filter'); ?>" />
     <input type="hidden" name="reportView" value="true" />
+    </div>
+    <div style=" float: right; margin-top: 12px; width: calc(100% + 10px);"  >
+    <div class="infoBox" style="">
+    <?php echo __('Report Sort By'); ?>
+    </div>
+    <div class="sub_section">
+    <div id="filterForm">
+        <div class="divRow">
+            <div class="divRowContent">
+            <?php
+            $tipe_options[] = array('member_id', __('Member ID'));
+            $tipe_options[] = array('member_since_date', __('Member Since'));
+            $tipe_options[] = array('major', __('Major'));
+            $tipe_options[] = array('generation', __('Generation'));
+            $by_options[] = array('ASC', __('ASC'));
+            $by_options[] = array('DESC', __('DESC'));
+            echo simbio_form_element::selectList('tipe', $tipe_options);             
+            echo simbio_form_element::selectList('by', $by_options);
+
+            ?>
+            </div>
+            <div style="padding-top: 10px; clear: both;">
+    <input type="submit" name="applyFilter" value="<?php echo __('Apply Sort by'); ?>" />
+    </div>
+        </div>
+    </div>
     </div>
     </form>
 	</div>
@@ -199,7 +225,6 @@ if (!$reportView) {
         'm.member_name AS \''.__('Member Name').'\'',
         'mt.member_type_name AS \''.__('Membership Type').'\'',
         'm.member_since_date AS \''.__('Membership Since').'\'');
-    $reportgrid->setSQLorder('member_name ASC');
 
     // is there any search
     $criteria = 'm.member_id IS NOT NULL AND TO_DAYS(expire_date)>TO_DAYS(\''.date('Y-m-d').'\')';
@@ -241,7 +266,17 @@ if (!$reportView) {
     }
     if (isset($_GET['recsEachPage'])) {
         $recsEachPage = (integer)$_GET['recsEachPage'];
-        $num_recs_show = ($recsEachPage >= 20 && $recsEachPage <= 200)?$recsEachPage:$num_recs_show;
+        $num_recs_show = ($recsEachPage >= 20 && $recsEachPage <= 90000)?$recsEachPage:$num_recs_show;
+    }
+     // sort bay
+    if (isset($_GET['by']) AND !empty($_GET['by']) AND isset($_GET['tipe']) AND !empty($_GET['tipe']) ) {
+        $sort_by = $dbs->escape_string(trim($_GET['by']));
+        $sort_tipe = $dbs->escape_string(trim($_GET['tipe']));
+        $reportgrid->setSQLorder($sort_tipe.' '.$sort_by);  
+    }
+    else
+    {
+        $reportgrid->setSQLorder('member_name ASC');
     }
     $reportgrid->setSQLCriteria($criteria);
 
