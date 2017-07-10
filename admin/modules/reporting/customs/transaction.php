@@ -49,34 +49,11 @@ require SIMBIO.'simbio_GUI/form_maker/simbio_form_element.inc.php';
 require SIMBIO.'simbio_DB/datagrid/simbio_dbgrid.inc.php';
 require MDLBS.'reporting/report_dbgrid.inc.php';
 
-$page_title = 'Fines Report';
+$page_title = 'Transaction Details';
 $reportView = false;
 $num_recs_show = 20;
 if (isset($_GET['reportView'])) {
     $reportView = true;
-}
-if ($_GET['reportViewlist']==true) {
-    if (isset($_GET['date'])) {
-    $date = $_GET['date'];
-
-ob_start();
-    // table spec
-    $table_spec = 'fines AS f
-        LEFT JOIN member AS m ON f.member_id=m.member_id LEFT JOIN loan AS l on f.loan_id=l.loan_id LEFT JOIN item AS i on l.item_code=i.item_code LEFT JOIN item biblio AS b on i.biblio_id=b.biblio_id';
-
-    // create datagrid
-    $reportgrid = new report_datagrid();
-    $reportgrid->setSQLColumn('m.generation AS \''.__('Generation').'\'','m.major AS \''.__('Major').'\'',
-        'm.member_name AS \''.__('Member Name').'\'','b.title AS \''.__('Item').'\'' ,'f.debet AS \''.__('fines').'\'','l.loan_date AS \''.__('Loan date').'\'');
-    $reportgrid->setGroupBy('fines_date');
-    // is there any search
-    $criteria = 'f.fines_date==\''.$date.'\'';
-    $reportgrid->setSQLorder('m.member_name ASC');
-    $reportgrid->setSQLCriteria($criteria);
-        echo $reportgrid->createDataGrid($dbs, $table_spec, $num_recs_show);
-
-    }
-    exit();
 }
 
 if (!$reportView) {
@@ -84,52 +61,69 @@ if (!$reportView) {
     <!-- filter -->
     <fieldset>
     <div class="per_title">
-      <h2><?php echo __('Fines Report List'); ?></h2>
+      <h2><?php echo __('Transaction Details'); ?></h2>
     </div>
-    <div class="infoBox" >
+    <div class="infoBox">
     <?php echo __('Report Filter'); ?>
     </div>
     <div class="sub_section">
     <form method="get" action="<?php echo $_SERVER['PHP_SELF']; ?>" target="reportView">
     <div id="filterForm">
         <div class="divRow">
-            <div class="divRowLabel"><?php echo __('Date From'); ?></div>
+            <div class="divRowLabel"><?php echo __('Transaction Type'); ?></div>
             <div class="divRowContent">
-            <?php echo simbio_form_element::dateField('startDate', '2000-01-01'); ?>
+              <?php
+                  $type_options[] = array(0,'Loan');
+                  $type_options[] = array(1,'Return');
+                  $type_options[] = array(2,'ALL');
+              echo simbio_form_element::selectList('is_return', $type_options);
+            ?>
             </div>
-            <div class="divRowLabel"><?php echo __('Date Until'); ?></div>
+        </div>
+        <div class="divRow">
+            <div class="divRowLabel"><?php echo __('Membership Type'); ?></div>
             <div class="divRowContent">
-            <?php echo simbio_form_element::dateField('untilDate', date('Y-m-d')); ?>
+            <?php
+            $mtype_q = $dbs->query('SELECT member_type_id, member_type_name FROM mst_member_type');
+            $mtype_options = array();
+            $mtype_options[] = array('0', __('ALL'));
+            while ($mtype_d = $mtype_q->fetch_row()) {
+                $mtype_options[] = array($mtype_d[0], $mtype_d[1]);
+            }
+            echo simbio_form_element::selectList('member_type', $mtype_options);
+            ?>
             </div>
         </div>
         <div class="divRow">
             <div class="divRowLabel"><?php echo __('Generation'); ?></div>
             <div class="divRowContent">
             <?php
-                $generation_options[] = array(1,'ALL');
-                $generation_options[] = array(2016,'2016');
-                $generation_options[] = array(2017,'2017');
-                $generation_options[] = array(2018,'2018');
-            echo simbio_form_element::selectList('generation', $generation_options);
+              $generation_options[] = array(1,'ALL');
+              $year = date('Y');
+              $yearawal = 2016;
+              for($i=$yearawal;$i<=$year;$i++){
+                $generation_options[] = array($i,$i);
+              }
+              echo simbio_form_element::selectList('generation', $generation_options);
             ?>
             </div>
         </div>
         <div class="divRow">
             <div class="divRowLabel"><?php echo __('Faculty'); ?></div>
             <div class="divRowContent">
-            <?php
-                $faculty_options[] = array(0,'ALL');
-                $faculty_options[] = array(1,'Fakultas Teknologi Eksplorasi dan Produksi');
-                $faculty_options[] = array(2,'Fakultas Teknologi Industri');
-                $faculty_options[] = array(3,'Fakultas Management dan Bisnis');
-                $faculty_options[] = array(4,'Fakultas Perencanaan infrastruktur');
-                $faculty_options[] = array(5,'Fakultas Sains dan Komputer');
-                $faculty_options[] = array(6,'Fakultas Komunikasi dan Diplomasi');
-            echo simbio_form_element::selectList('faculty', $faculty_options);
+              <?php
+                  $faculty_options[] = array(0,'ALL');
+                  $faculty_options[] = array(1,'Fakultas Teknologi Eksplorasi dan Produksi');
+                  $faculty_options[] = array(2,'Fakultas Teknologi Industri');
+                  $faculty_options[] = array(3,'Fakultas Management dan Bisnis');
+                  $faculty_options[] = array(4,'Fakultas Perencanaan infrastruktur');
+                  $faculty_options[] = array(5,'Fakultas Sains dan Komputer');
+                  $faculty_options[] = array(6,'Fakultas Komunikasi dan Diplomasi');
+              echo simbio_form_element::selectList('faculty', $faculty_options);
             ?>
             </div>
         </div>
-               <div class="divRow">
+        <div class="divRow">
             <div class="divRowLabel"><?php echo __('Major'); ?></div>
             <div class="divRowContent">
             <?php
@@ -154,8 +148,26 @@ if (!$reportView) {
             </div>
         </div>
         <div class="divRow">
+            <div class="divRowLabel"><?php echo __('Member ID').'/'.__('Member Name'); ?></div>
+            <div class="divRowContent">
+            <?php echo simbio_form_element::textField('text', 'id_name', '', 'style="width: 50%"'); ?>
+            </div>
+        </div>
+        <div class="divRow">
+            <div class="divRowLabel"><?php echo __('Start Date'); ?></div>
+            <div class="divRowContent">
+            <?php echo simbio_form_element::dateField('startDate', '2000-01-01'); ?>
+            </div>
+        </div>
+        <div class="divRow">
+            <div class="divRowLabel"><?php echo __('End Date'); ?></div>
+            <div class="divRowContent">
+            <?php echo simbio_form_element::dateField('endDate', date('Y-m-d')); ?>
+            </div>
+        </div>
+        <div class="divRow">
             <div class="divRowLabel"><?php echo __('Record each page'); ?></div>
-            <div class="divRowContent"><input type="text" name="recsEachPage" size="5" maxlength="5" value="<?php echo $num_recs_show; ?>" /> <?php echo __('Set between 20 and 90000'); ?></div>
+            <div class="divRowContent"><input type="text" name="recsEachPage" size="3" maxlength="3" value="<?php echo $num_recs_show; ?>" /> <?php echo __('Set between 20 and 200'); ?></div>
         </div>
     </div>
     <div style="padding-top: 10px; clear: both;">
@@ -172,13 +184,13 @@ if (!$reportView) {
         <div class="divRow">
             <div class="divRowContent">
             <?php
-            $tipe_options[] = array('member_id', __('Member ID'));
-            $tipe_options[] = array('member_since_date', __('Member Since'));
-            $tipe_options[] = array('major', __('Major'));
             $tipe_options[] = array('generation', __('Generation'));
+            $tipe_options[] = array('major', __('Major'));
+            $tipe_options[] = array('m.member_id', __('Member ID'));
+            $tipe_options[] = array('member_name', __('Name'));
             $by_options[] = array('ASC', __('ASC'));
             $by_options[] = array('DESC', __('DESC'));
-            echo simbio_form_element::selectList('tipe', $tipe_options);             
+            echo simbio_form_element::selectList('tipe', $tipe_options);
             echo simbio_form_element::selectList('by', $by_options);
 
             ?>
@@ -195,72 +207,76 @@ if (!$reportView) {
     <!-- filter end -->
     <div class="dataListHeader" style="padding: 3px;"><span id="pagingBox"></span></div>
     <iframe name="reportView" id="reportView" src="<?php echo $_SERVER['PHP_SELF'].'?reportView=true'; ?>" frameborder="0" style="width: 100%; height: 500px;"></iframe>
-        <div class="dataListHeader" style="padding: 3px;"></div>
-     <iframe name="reportViewlist" id="reportViewlist" src="<?php echo $_SERVER['PHP_SELF'].'?reportViewlist=blank'; ?>" frameborder="0" style="width: 100%; height: 300px;"></iframe>
 <?php
 } else {
 
     ob_start();
     // table spec
-    $table_spec = 'fines AS f
-        LEFT JOIN member AS m ON f.member_id=m.member_id LEFT JOIN loan AS l on f.loan_id=l.loan_id';
+    $table_spec = 'loan AS l
+        LEFT JOIN member AS m ON l.member_id=m.member_id
+        LEFT JOIN mst_member_type AS mt ON m.member_type_id=mt.member_type_id';
 
     // create datagrid
-    $reportgrid = new simbio_datagrid();
+    $reportgrid = new report_datagrid();
+    $isreturn = intval($_GET['is_return']);
     $reportgrid->setSQLColumn('m.generation AS \''.__('Generation').'\'','m.major AS \''.__('Major').'\'','m.member_id AS \''.__('Member ID').'\'',
         'm.member_name AS \''.__('Member Name').'\'',
-        
-        'm.member_since_date AS \''.__('Membership Since').'\'');
-    $reportgrid->setGroupBy('fines_date');
+        'mt.member_type_name AS \''.__('Membership Type').'\'');
+    $reportgrid->setSQLorder('m.member_name ASC');
 
     // is there any search
     $criteria = 'm.member_id IS NOT NULL AND TO_DAYS(expire_date)>TO_DAYS(\''.date('Y-m-d').'\')';
+    if (isset($_GET['is_return'])) {
+        $isreturn = intval($_GET['is_return']);
+        $criteria .= $isreturn != 2 ? ' AND l.is_return='.$isreturn : '' ;
+    }
+    if (isset($_GET['member_type']) AND !empty($_GET['member_type'])) {
+        $mtype = intval($_GET['member_type']);
+        $criteria .= ' AND m.member_type_id='.$mtype;
+    }
     if (isset($_GET['id_name']) AND !empty($_GET['id_name'])) {
         $id_name = $dbs->escape_string($_GET['id_name']);
         $criteria .= ' AND (m.member_id LIKE \'%'.$id_name.'%\' OR m.member_name LIKE \'%'.$id_name.'%\')';
     }
-    if (isset($_GET['gender']) AND $_GET['gender'] != 'ALL') {
-        $gender = intval($_GET['gender']);
-        $criteria .= ' AND m.gender='.$gender;
-    }
-    if (isset($_GET['address']) AND !empty($_GET['address'])) {
-        $address = $dbs->escape_string(trim($_GET['address']));
-        $criteria .= ' AND m.member_address LIKE \'%'.$address.'%\'';
-    }
-    //more generation
-        if (isset($_GET['generation']) AND !empty($_GET['generation']) AND $_GET['generation']!=1) {
+    if (isset($_GET['generation']) AND !empty($_GET['generation']) AND $_GET['generation']!=1) {
         $generation = $dbs->escape_string(trim($_GET['generation']));
-        $criteria .= ' AND m.generation=\''.$generation.'\'';    
+        $criteria .= ' AND m.generation=\''.$generation.'\'';
     }
-    //more generation
         if (isset($_GET['major']) AND !empty($_GET['major']) AND $_GET['major']!=1) {
         $major = $dbs->escape_string(trim($_GET['major']));
-        $criteria .= ' AND m.major=\''.$major.'\'';  
+        $criteria .= ' AND m.major=\''.$major.'\'';
     }
-    //more generation
         if (isset($_GET['faculty']) AND !empty($_GET['faculty']) AND $_GET['faculty']!=0) {
         $faculty = $dbs->escape_string(trim($_GET['faculty']));
         $criteria .= ' AND substr(m.member_id,3,1)=\''.$faculty.'\'';
     }
-    // register date
-    if (isset($_GET['startDate']) AND isset($_GET['untilDate'])) {
-        $criteria .= ' AND (TO_DAYS(m.register_date) BETWEEN TO_DAYS(\''.$_GET['startDate'].'\') AND
-            TO_DAYS(\''.$_GET['untilDate'].'\'))';
+    if (isset($_GET['startDate']) AND isset($_GET['endDate'])) {
+      $isreturn = intval($_GET['is_return']);
+      if($isreturn == 1){
+        $criteria .= ' AND (TO_DAYS(l.return_date) BETWEEN TO_DAYS(\''.$_GET['startDate'].'\') AND
+            TO_DAYS(\''.$_GET['endDate'].'\'))';
+      } else {
+        $criteria .= ' AND (TO_DAYS(l.loan_date) BETWEEN TO_DAYS(\''.$_GET['startDate'].'\') AND
+            TO_DAYS(\''.$_GET['endDate'].'\'))';
+      }
+
     }
     if (isset($_GET['recsEachPage'])) {
         $recsEachPage = (integer)$_GET['recsEachPage'];
         $num_recs_show = ($recsEachPage >= 20 && $recsEachPage <= 90000)?$recsEachPage:$num_recs_show;
     }
-     // sort bay
+
+    // sort bay
     if (isset($_GET['by']) AND !empty($_GET['by']) AND isset($_GET['tipe']) AND !empty($_GET['tipe']) ) {
         $sort_by = $dbs->escape_string(trim($_GET['by']));
         $sort_tipe = $dbs->escape_string(trim($_GET['tipe']));
-        $reportgrid->setSQLorder('m.'.$sort_tipe.' '.$sort_by);  
+        $reportgrid->setSQLorder($sort_tipe.' '.$sort_by);
     }
     else
     {
-        $reportgrid->setSQLorder('m.member_name ASC');
+      $reportgrid->setSQLorder('m.member_name ASC');
     }
+
     $reportgrid->setSQLCriteria($criteria);
 
     // put the result into variables
@@ -270,7 +286,8 @@ if (!$reportView) {
     echo 'parent.$(\'#pagingBox\').html(\''.str_replace(array("\n", "\r", "\t"), '', $reportgrid->paging_set).'\');'."\n";
     echo '</script>';
 	$xlsquery = 'SELECT m.member_id AS \''.__('Member ID').'\''.
-        ', m.member_name AS \''.__('Member Name').'\' FROM '.$table_spec.' WHERE '.$criteria;
+        ', m.member_name AS \''.__('Member Name').'\''.
+        ', mt.member_type_name AS \''.__('Membership Type').'\' FROM '.$table_spec.' WHERE '.$criteria;
 
 	unset($_SESSION['xlsdata']);
 	$_SESSION['xlsquery'] = $xlsquery;
