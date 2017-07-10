@@ -83,20 +83,6 @@ class simbio_datagrid extends simbio_table
      * @param   boolean $bool_editable
      * @return  string
      */
-    public function nama_prodi($id)
-    {   switch ($id) {
-        case 52:
-            $id="Ilmu Komputer";
-            break;
-        case 51:
-            $id="Ilmu Kimia";
-            break;
-        default:
-            $id="tidak ada";
-            break;
-    }
-    return $id;
-    }
     public function createDataGrid($obj_db, $str_db_table = '', $int_num2show = 30, $bool_editable = false)
     {
         // Default checkbox properties
@@ -488,6 +474,16 @@ class simbio_datagrid extends simbio_table
      *
      * @param   string  $str_order_column
      */
+    public function setGroupBy($str_group_by)
+    {
+        if (!$str_group_by) {
+            // do nothing
+        } else {
+            // remove WHERE word if exist
+            $this->sql_order = 'Group BY '.$str_group_by;
+        }
+    }
+
     public function setSQLorder($str_order_column)
     {
         if (!$str_order_column) {
