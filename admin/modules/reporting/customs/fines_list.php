@@ -55,6 +55,10 @@ $num_recs_show = 20;
 if (isset($_GET['reportView'])) {
     $reportView = true;
 }
+if (isset($_GET['reportViewlist'])) {
+    $reportViewlist = true;
+}
+
 
 if (!$reportView) {
 ?>
@@ -172,9 +176,29 @@ if (!$reportView) {
     <!-- filter end -->
     <div class="dataListHeader" style="padding: 3px;"><span id="pagingBox"></span></div>
     <iframe name="reportView" id="reportView" src="<?php echo $_SERVER['PHP_SELF'].'?reportView=true'; ?>" frameborder="0" style="width: 100%; height: 500px;"></iframe>
-     <iframe name="reportViewlist" id="reportViewlist" src="<?php echo $_SERVER['PHP_SELF'].'?reportViewlist=true'; ?>" frameborder="0" style="width: 100%; height: 300px;"></iframe>
+     <iframe name="reportViewlist" id="reportViewlist" src="<?php echo $_SERVER['PHP_SELF'].'?reportViewlist=true&date='; ?>" frameborder="0" style="width: 100%; height: 300px;"></iframe>
 <?php
-} else {
+} else if (!$reportViewlist) {  
+    if (isset($_GET['date'])) {
+    $date = $_GET['date'];
+
+ob_start();
+    // table spec
+    $table_spec = 'fines AS f
+        LEFT JOIN member AS m ON f.member_id=m.member_id LEFT JOIN loan AS l on f.loan_id=l.loan_id LEFT item loan AS i on l.item_code=i.item_code LEFT item biblio AS b on i.biblio_id=b.biblio_id';
+
+    // create datagrid
+    $reportgrid = new report_datagrid();
+    $reportgrid->setSQLColumn('m.generation AS \''.__('Generation').'\'','m.major AS \''.__('Major').'\'',
+        'm.member_name AS \''.__('Member Name').'\'','b.title AS \''.__('Item').'\'' ,'f.debet AS \''.__('fines').'\'','l.loan_date AS \''.__('Loan date').'\'');
+    $reportgrid->setGroupBy('fines_date');
+    // is there any search
+    $criteria = 'f.fines_date==\''.$date.'\'';
+    $reportgrid->setSQLorder('m.member_name ASC');
+    $reportgrid->setSQLCriteria($criteria);
+    }
+    
+}else {
 
     ob_start();
     // table spec
@@ -231,11 +255,11 @@ if (!$reportView) {
     if (isset($_GET['by']) AND !empty($_GET['by']) AND isset($_GET['tipe']) AND !empty($_GET['tipe']) ) {
         $sort_by = $dbs->escape_string(trim($_GET['by']));
         $sort_tipe = $dbs->escape_string(trim($_GET['tipe']));
-        $reportgrid->setSQLorder($sort_tipe.' '.$sort_by);  
+        $reportgrid->setSQLorder('m.'.$sort_tipe.' '.$sort_by);  
     }
     else
     {
-        $reportgrid->setSQLorder('member_name ASC');
+        $reportgrid->setSQLorder('m.member_name ASC');
     }
     $reportgrid->setSQLCriteria($criteria);
 
@@ -246,8 +270,7 @@ if (!$reportView) {
     echo 'parent.$(\'#pagingBox\').html(\''.str_replace(array("\n", "\r", "\t"), '', $reportgrid->paging_set).'\');'."\n";
     echo '</script>';
 	$xlsquery = 'SELECT m.member_id AS \''.__('Member ID').'\''.
-        ', m.member_name AS \''.__('Member Name').'\''.
-        ', mt.member_type_name AS \''.__('Membership Type').'\' FROM '.$table_spec.' WHERE '.$criteria;
+        ', m.member_name AS \''.__('Member Name').'\' FROM '.$table_spec.' WHERE '.$criteria;
 
 	unset($_SESSION['xlsdata']);
 	$_SESSION['xlsquery'] = $xlsquery;

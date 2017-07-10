@@ -272,7 +272,7 @@ if (!$reportView) {
     if (isset($_GET['by']) AND !empty($_GET['by']) AND isset($_GET['tipe']) AND !empty($_GET['tipe']) ) {
         $sort_by = $dbs->escape_string(trim($_GET['by']));
         $sort_tipe = $dbs->escape_string(trim($_GET['tipe']));
-        $reportgrid->setSQLorder($sort_tipe.' '.$sort_by);  
+        $reportgrid->setSQLorder('m.'.$sort_tipe.' '.$sort_by);  
     }
     else
     {
