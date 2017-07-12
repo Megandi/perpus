@@ -38,6 +38,8 @@ class report_datagrid extends simbio_datagrid
         $this->table_header_attr = 'class="dataListHeaderPrinted"';
     }
 
+  
+
     /**
      * Modified method to make HTML output more friendly to printer
      *

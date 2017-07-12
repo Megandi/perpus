@@ -83,12 +83,11 @@ class simbio_datagrid extends simbio_table
      * @param   boolean $bool_editable
      * @return  string
      */
-    public function createDataGrid($obj_db, $str_db_table = '', $int_num2show = 30, $bool_editable = false)
+    public function createDataGrid($obj_db, $str_db_table = '', $int_num2show = 30, $bool_editable = false, $detail)
     {
         // Default checkbox properties
         if (!isset($this->chbox_property)) $this->chbox_property = array('itemID', __('DELETE'));
         if (!isset($this->edit_property)) $this->edit_property = array('itemID', __('EDIT'));
-
 
         // check database connection
         if (!$obj_db OR $obj_db->error) {
@@ -100,6 +99,8 @@ class simbio_datagrid extends simbio_table
 
         // set editable flag
         $this->editable = $bool_editable;
+        $this->detailtable = $detail;
+
 
         if (!$this->chbox_confirm_msg) {
             $this->chbox_confirm_msg = __('Are You Sure Want to DELETE Selected Data?');
@@ -241,6 +242,30 @@ class simbio_datagrid extends simbio_table
             }
         }
 
+
+        if ($this->detailtable) {
+            // invisible fields shifting value
+            $_shift = 1;
+            // chbox and edit property checking
+            if ($this->edit_property) {
+                $_edit_header_fields = array($this->edit_property[1]);
+                $_shift = 2;
+            } else {
+                $_edit_header_fields = array($this->edit_property[1]);
+            }
+            // concat arrays
+            unset($this->grid_result_fields[0]);
+            $this->grid_result_fields = array_merge($_edit_header_fields, $this->grid_result_fields);
+            // invisible field shifting
+            if ($this->invisible_fields) {
+                $_shifted_inv_fld = array();
+                foreach ($this->invisible_fields as $_inv_fld) {
+                    $_shifted_inv_fld[] = $_inv_fld+$_shift;
+                }
+                $this->invisible_fields = $_shifted_inv_fld;
+            }
+        }
+
         // field count
         $_field_cnt = count($this->grid_result_fields);
 
@@ -284,6 +309,21 @@ class simbio_datagrid extends simbio_table
                     $_edit_data = $this->edit_property[0].'='.$this->grid_result_rows[$_row][0].'&detail=true';
                     $_edit_link = '<a class="editLink'.( !$this->using_AJAX?' notAJAX':'' ).'" '
                         .'href="'.$_SERVER['PHP_SELF'].'?'.$_edit_data.'&'.$_url_query_str.'" postdata="'.$_edit_data.'" title="Edit">'.( $this->edit_link_text?$this->edit_link_text:'&nbsp;' ).'</a>';
+                    $_edit_fields[] = $_edit_link;
+                }
+                // unset the first element (ID field)
+                unset($this->grid_result_rows[$_row][0]);
+                $this->grid_result_rows[$_row] = array_merge($_edit_fields, $this->grid_result_rows[$_row]);
+            }
+
+            if ($this->detailtable) {
+                // reset edit_fields array
+                $_edit_fields = array();
+                // check if edit link array is included
+                if ($this->edit_property) {
+                    $_edit_data = 'date='.$this->grid_result_rows[$_row][0];
+                    $_edit_link = '<a class="'.( !$this->using_AJAX?' notAJAX':'' ).'" '
+                        .'href="'.$_SERVER['PHP_SELF'].'?'.$_edit_data.'&reportViewlist=true" postdata="'.$_edit_data.'" title="Edit" target="reportViewlist">'.( 'Detail' ).'</a>';
                     $_edit_fields[] = $_edit_link;
                 }
                 // unset the first element (ID field)

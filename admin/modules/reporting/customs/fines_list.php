@@ -55,7 +55,35 @@ $num_recs_show = 20;
 if (isset($_GET['reportView'])) {
     $reportView = true;
 }
+if ($_GET['reportViewlist']==true) {
+    if (isset($_GET['date'])) {
+      $date = $_GET['date'];
 
+      ob_start();
+      // table spec
+      $table_spec = 'fines AS f
+          LEFT JOIN member AS m
+          ON f.member_id=m.member_id
+          LEFT JOIN loan AS l
+          ON f.loan_id=l.loan_id
+          LEFT JOIN item AS i
+          ON l.item_code=i.item_code
+          LEFT JOIN biblio AS b on i.biblio_id=b.biblio_id';
+
+      // create datagrid
+      $reportgrid = new report_datagrid();
+      $reportgrid->setSQLColumn('m.generation AS \''._('Generation').'\'','m.major AS \''._('Major').'\'',
+          'm.member_name AS \''._('Member Name').'\'','b.title AS \''.('Item').'\'' ,'f.debet AS \''.('fines').'\'','l.loan_date AS \''._('Loan date').'\'');
+      $reportgrid->setGroupBy('fines_date');
+      // is there any search
+      $criteria = 'f.fines_date=\''.$date.'\'';
+      $reportgrid->setSQLorder('m.member_name ASC');
+      $reportgrid->setSQLCriteria($criteria);
+      echo $reportgrid->createDataGrid($dbs, $table_spec, $num_recs_show);
+    }
+    require SB.'/admin/'.$sysconf['admin_template']['dir'].'/printed_page_tpl.php';
+    exit();
+}
 if (!$reportView) {
 ?>
     <!-- filter -->
@@ -80,57 +108,6 @@ if (!$reportView) {
             </div>
         </div>
         <div class="divRow">
-            <div class="divRowLabel"><?php echo __('Generation'); ?></div>
-            <div class="divRowContent">
-            <?php
-                $generation_options[] = array(1,'ALL');
-                $generation_options[] = array(2016,'2016');
-                $generation_options[] = array(2017,'2017');
-                $generation_options[] = array(2018,'2018');
-            echo simbio_form_element::selectList('generation', $generation_options);
-            ?>
-            </div>
-        </div>
-        <div class="divRow">
-            <div class="divRowLabel"><?php echo __('Faculty'); ?></div>
-            <div class="divRowContent">
-            <?php
-                $faculty_options[] = array(0,'ALL');
-                $faculty_options[] = array(1,'Fakultas Teknologi Eksplorasi dan Produksi');
-                $faculty_options[] = array(2,'Fakultas Teknologi Industri');
-                $faculty_options[] = array(3,'Fakultas Management dan Bisnis');
-                $faculty_options[] = array(4,'Fakultas Perencanaan infrastruktur');
-                $faculty_options[] = array(5,'Fakultas Sains dan Komputer');
-                $faculty_options[] = array(6,'Fakultas Komunikasi dan Diplomasi');
-            echo simbio_form_element::selectList('faculty', $faculty_options);
-            ?>
-            </div>
-        </div>
-               <div class="divRow">
-            <div class="divRowLabel"><?php echo __('Major'); ?></div>
-            <div class="divRowContent">
-            <?php
-                $major_options[] = array(1,'ALL');
-                $major_options[] = array('Teknik Geofisika','Teknik Geofisika');
-                $major_options[] = array('Teknik Geologi','Teknik Geologi');
-                $major_options[] = array('Teknik Perminyakan','Teknik Perminyakan');
-                $major_options[] = array('Teknik Elektro','Teknik Elektro');
-                $major_options[] = array('Teknik Mesin','Teknik Mesin');
-                $major_options[] = array('Teknik Kimia','Teknik Kimia');
-                $major_options[] = array('Teknik Logistik','Teknik Logistik');
-                $major_options[] = array('Teknik Sipil','Teknik Sipil');
-                $major_options[] = array('Teknik Lingkungan','Teknik Lingkungan');
-                $major_options[] = array('Ilmu Komputer','Ilmu Komputer');
-                $major_options[] = array('Ilmu Kimia','Ilmu Kimia');
-                $major_options[] = array('Management','Management');
-                $major_options[] = array('Ekonomi','Ekonomi');
-                $major_options[] = array('Ilmu Komunikasi','Ilmu Komunikasi');
-                $major_options[] = array('Hubungan Internasional','Hubungan Internasional');
-            echo simbio_form_element::selectList('major', $major_options);
-            ?>
-            </div>
-        </div>
-        <div class="divRow">
             <div class="divRowLabel"><?php echo __('Record each page'); ?></div>
             <div class="divRowContent"><input type="text" name="recsEachPage" size="5" maxlength="5" value="<?php echo $num_recs_show; ?>" /> <?php echo __('Set between 20 and 90000'); ?></div>
         </div>
@@ -149,13 +126,11 @@ if (!$reportView) {
         <div class="divRow">
             <div class="divRowContent">
             <?php
-            $tipe_options[] = array('member_id', __('Member ID'));
-            $tipe_options[] = array('member_since_date', __('Member Since'));
-            $tipe_options[] = array('major', __('Major'));
-            $tipe_options[] = array('generation', __('Generation'));
+            $tipe_options[] = array('debet', __('Total'));
+            $tipe_options[] = array('fines_date', __('Fines Date'));
             $by_options[] = array('ASC', __('ASC'));
             $by_options[] = array('DESC', __('DESC'));
-            echo simbio_form_element::selectList('tipe', $tipe_options);             
+            echo simbio_form_element::selectList('tipe', $tipe_options);
             echo simbio_form_element::selectList('by', $by_options);
 
             ?>
@@ -172,55 +147,23 @@ if (!$reportView) {
     <!-- filter end -->
     <div class="dataListHeader" style="padding: 3px;"><span id="pagingBox"></span></div>
     <iframe name="reportView" id="reportView" src="<?php echo $_SERVER['PHP_SELF'].'?reportView=true'; ?>" frameborder="0" style="width: 100%; height: 500px;"></iframe>
-     <iframe name="reportViewlist" id="reportViewlist" src="<?php echo $_SERVER['PHP_SELF'].'?reportViewlist=true'; ?>" frameborder="0" style="width: 100%; height: 300px;"></iframe>
-<?php
-} else {
+     <iframe name="reportViewlist" id="reportViewlist" src="<?php echo $_SERVER['PHP_SELF'].'?reportViewlist=true'; ?>" frameborder="0" style="width: 100%; height: 300px;padding:10px;"></iframe>
+     <?php
+    } else {
 
     ob_start();
     // table spec
-    $table_spec = 'fines AS f
-        LEFT JOIN member AS m ON f.member_id=m.member_id LEFT JOIN loan AS l on f.loan_id=l.loan_id';
+    $table_spec = 'fines';
 
     // create datagrid
     $reportgrid = new report_datagrid();
-    $reportgrid->setSQLColumn('m.generation AS \''.__('Generation').'\'','m.major AS \''.__('Major').'\'','m.member_id AS \''.__('Member ID').'\'',
-        'm.member_name AS \''.__('Member Name').'\'',
-        
-        'm.member_since_date AS \''.__('Membership Since').'\'');
-    $reportgrid->setGroupBy('fines_date');
+    $reportgrid->setSQLColumn('fines_date AS \''.__('Fines Date').'\'','fines_date AS \''.__('Fines Date').'\'','SUM(debet) AS \''.__('Total').'\'');
 
     // is there any search
-    $criteria = 'm.member_id IS NOT NULL AND TO_DAYS(expire_date)>TO_DAYS(\''.date('Y-m-d').'\')';
-    if (isset($_GET['id_name']) AND !empty($_GET['id_name'])) {
-        $id_name = $dbs->escape_string($_GET['id_name']);
-        $criteria .= ' AND (m.member_id LIKE \'%'.$id_name.'%\' OR m.member_name LIKE \'%'.$id_name.'%\')';
-    }
-    if (isset($_GET['gender']) AND $_GET['gender'] != 'ALL') {
-        $gender = intval($_GET['gender']);
-        $criteria .= ' AND m.gender='.$gender;
-    }
-    if (isset($_GET['address']) AND !empty($_GET['address'])) {
-        $address = $dbs->escape_string(trim($_GET['address']));
-        $criteria .= ' AND m.member_address LIKE \'%'.$address.'%\'';
-    }
-    //more generation
-        if (isset($_GET['generation']) AND !empty($_GET['generation']) AND $_GET['generation']!=1) {
-        $generation = $dbs->escape_string(trim($_GET['generation']));
-        $criteria .= ' AND m.generation=\''.$generation.'\'';    
-    }
-    //more generation
-        if (isset($_GET['major']) AND !empty($_GET['major']) AND $_GET['major']!=1) {
-        $major = $dbs->escape_string(trim($_GET['major']));
-        $criteria .= ' AND m.major=\''.$major.'\'';  
-    }
-    //more generation
-        if (isset($_GET['faculty']) AND !empty($_GET['faculty']) AND $_GET['faculty']!=0) {
-        $faculty = $dbs->escape_string(trim($_GET['faculty']));
-        $criteria .= ' AND substr(m.member_id,3,1)=\''.$faculty.'\'';
-    }
+    $criteria = 'loan_id IS NOT NULL';
     // register date
     if (isset($_GET['startDate']) AND isset($_GET['untilDate'])) {
-        $criteria .= ' AND (TO_DAYS(m.register_date) BETWEEN TO_DAYS(\''.$_GET['startDate'].'\') AND
+        $criteria .= ' AND (TO_DAYS(fines_date) BETWEEN TO_DAYS(\''.$_GET['startDate'].'\') AND
             TO_DAYS(\''.$_GET['untilDate'].'\'))';
     }
     if (isset($_GET['recsEachPage'])) {
@@ -231,16 +174,18 @@ if (!$reportView) {
     if (isset($_GET['by']) AND !empty($_GET['by']) AND isset($_GET['tipe']) AND !empty($_GET['tipe']) ) {
         $sort_by = $dbs->escape_string(trim($_GET['by']));
         $sort_tipe = $dbs->escape_string(trim($_GET['tipe']));
-        $reportgrid->setSQLorder($sort_tipe.' '.$sort_by);  
+        $criteria .= ' GROUP BY fines_date ';
+        $reportgrid->setSQLorder($sort_tipe.' '.$sort_by);
     }
     else
     {
-        $reportgrid->setSQLorder('member_name ASC');
+        $criteria .= ' GROUP BY fines_date ';
+        $reportgrid->setSQLorder('fines_date ASC');
     }
     $reportgrid->setSQLCriteria($criteria);
 
     // put the result into variables
-    echo $reportgrid->createDataGrid($dbs, $table_spec, $num_recs_show);
+    echo $reportgrid->createDataGrid($dbs, $table_spec, $num_recs_show,'', true);
 
     echo '<script type="text/javascript">'."\n";
     echo 'parent.$(\'#pagingBox\').html(\''.str_replace(array("\n", "\r", "\t"), '', $reportgrid->paging_set).'\');'."\n";

@@ -27,6 +27,7 @@ if (INDEX_AUTH != 1) {
 
 $menu[] = array(__('Custom Recapitulations'), MWB.'reporting/customs/class_recap.php', __('Title and Collection recapitulation based on classification and others'));
 $menu[] = array(__('Title List'), MWB.'reporting/customs/titles_list.php', __('List of bibliographic titles'));
+$menu[] = array(__('Top Books'), MWB.'reporting/customs/most_loan.php', __('Top Books'));
 $menu[] = array(__('Items Title List'), MWB.'reporting/customs/item_titles_list.php', __('List of collection/items'));
 $menu[] = array(__('Items Usage Statistics'), MWB.'reporting/customs/item_usage.php', __('List of Collection/items usage statistic'));
 $menu[] = array(__('Loans by Classification'), MWB.'reporting/customs/loan_by_class.php', __('Loan statistic by classification'));

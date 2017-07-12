@@ -56,7 +56,7 @@ if (!$can_read) {
 /* Just In Case for PHP < 5.4 */
 /* Taken From imageman (http://www.php.net/manual/en/function.getimagesizefromstring.php#113976) */
 /* Make sure to set allow_url_fopen = on inside your php.ini */
-if (version_compare(phpversion(), '5.4', '<')) 
+if (version_compare(phpversion(), '5.4', '<'))
 {
     function getimagesizefromstring($string_data)
     {
@@ -437,7 +437,7 @@ if (isset($_POST['detail']) OR (isset($_GET['action']) AND $_GET['action'] == 'd
     // Generation
     $generation_chbox[] = array('','None');
     for($i=2016; $i<=date('Y'); $i++){
-          $generation_chbox[] = array($i, $i);  
+          $generation_chbox[] = array($i, $i);
     }
     $form->addSelectList('generation', __('Generation'), $generation_chbox, $rec_d['generation']);
     // member type
