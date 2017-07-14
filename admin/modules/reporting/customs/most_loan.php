@@ -83,7 +83,7 @@ if (!$reportView) {
         </div>
         <div class="divRow">
             <div class="divRowLabel"><?php echo __('Record each page'); ?></div>
-            <div class="divRowContent"><input type="text" name="recsEachPage" size="3" maxlength="3" value="<?php echo $num_recs_show; ?>" /> <?php echo __('Set between 20 and 90000'); ?></div>
+            <div class="divRowContent"><input type="text" name="recsEachPage" size="5" maxlength="5" value="<?php echo $num_recs_show; ?>" /> <?php echo __('Set between 20 and 90000'); ?></div>
         </div>
     </div>
     <div style="padding-top: 10px; clear: both;">
@@ -122,7 +122,7 @@ if (!$reportView) {
         $recsEachPage = (integer)$_GET['recsEachPage'];
         $num_recs_show = ($recsEachPage >= 20 && $recsEachPage <= 90000)?$recsEachPage:$num_recs_show;
     }
-    $criteria .= ' GROUP BY i.item_code ';
+    $criteria .= ' GROUP BY b.biblio_id ';
     $reportgrid->setSQLorder('COUNT(i.item_code) DESC');
 
     $reportgrid->setSQLCriteria($criteria);
@@ -133,9 +133,7 @@ if (!$reportView) {
     echo '<script type="text/javascript">'."\n";
     echo 'parent.$(\'#pagingBox\').html(\''.str_replace(array("\n", "\r", "\t"), '', $reportgrid->paging_set).'\');'."\n";
     echo '</script>';
-	  $xlsquery = 'SELECT i.item_code AS \''.__('Item Code').'\''.
-        ', b.title AS \''.__('Title').'\''.
-        ', COUNT(i.item_code) AS \''.__('Total').'\' FROM '.$table_spec.' WHERE '.$criteria;
+	  $xlsquery = 'SELECT i.item_code AS \''.__('Item Code').'\'','b.title AS \''.__('Title').'\'','COUNT(i.item_code) AS \''.__('Total').'\' FROM '.$table_spec.' WHERE '.$criteria;
 
   	unset($_SESSION['xlsdata']);
   	$_SESSION['xlsquery'] = $xlsquery;

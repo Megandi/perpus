@@ -264,21 +264,19 @@ if (!$reportView) {
         $criteria .= ' AND (TO_DAYS(m.register_date) BETWEEN TO_DAYS(\''.$_GET['startDate'].'\') AND
             TO_DAYS(\''.$_GET['untilDate'].'\'))';
     }
-
-
     if (isset($_GET['recsEachPage'])) {
         $recsEachPage = (integer)$_GET['recsEachPage'];
         $num_recs_show = ($recsEachPage >= 20 && $recsEachPage <= 90000)?$recsEachPage:$num_recs_show;
     }
-     // sort by
+     // sort bay
     if (isset($_GET['by']) AND !empty($_GET['by']) AND isset($_GET['tipe']) AND !empty($_GET['tipe']) ) {
         $sort_by = $dbs->escape_string(trim($_GET['by']));
         $sort_tipe = $dbs->escape_string(trim($_GET['tipe']));
-        $reportgrid->setSQLorder($sort_tipe.' '.$sort_by);
+        $reportgrid->setSQLorder('m.'.$sort_tipe.' '.$sort_by);
     }
     else
     {
-        $reportgrid->setSQLorder('member_name ASC');
+        $reportgrid->setSQLorder('m.member_name ASC');
     }
     $reportgrid->setSQLCriteria($criteria);
 
@@ -288,9 +286,12 @@ if (!$reportView) {
     echo '<script type="text/javascript">'."\n";
     echo 'parent.$(\'#pagingBox\').html(\''.str_replace(array("\n", "\r", "\t"), '', $reportgrid->paging_set).'\');'."\n";
     echo '</script>';
-	$xlsquery = 'SELECT m.member_id AS \''.__('Member ID').'\''.
-        ', m.member_name AS \''.__('Member Name').'\''.
-        ', mt.member_type_name AS \''.__('Membership Type').'\' FROM '.$table_spec.' WHERE '.$criteria;
+	   $xlsquery = 'SELECT m.generation AS \''.__('Generation').'\'','m.major AS \''.__('Major').'\'','m.member_id AS \''.__('Member ID').'\'',
+      'm.member_name AS \''.__('Member Name').'\'',
+      'mt.member_type_name AS \''.__('Membership Type').'\'',
+      'm.member_since_date AS \''.__('Membership Since').'\' FROM '.$table_spec.' WHERE '.$criteria;
+
+
 
 	unset($_SESSION['xlsdata']);
 	$_SESSION['xlsquery'] = $xlsquery;

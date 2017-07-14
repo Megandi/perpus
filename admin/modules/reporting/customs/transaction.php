@@ -167,7 +167,7 @@ if (!$reportView) {
         </div>
         <div class="divRow">
             <div class="divRowLabel"><?php echo __('Record each page'); ?></div>
-            <div class="divRowContent"><input type="text" name="recsEachPage" size="3" maxlength="3" value="<?php echo $num_recs_show; ?>" /> <?php echo __('Set between 20 and 200'); ?></div>
+            <div class="divRowContent"><input type="text" name="recsEachPage" size="5" maxlength="5" value="<?php echo $num_recs_show; ?>" /> <?php echo __('Set between 20 and 90000'); ?></div>
         </div>
     </div>
     <div style="padding-top: 10px; clear: both;">
@@ -214,14 +214,20 @@ if (!$reportView) {
     // table spec
     $table_spec = 'loan AS l
         LEFT JOIN member AS m ON l.member_id=m.member_id
-        LEFT JOIN mst_member_type AS mt ON m.member_type_id=mt.member_type_id';
+        LEFT JOIN mst_member_type AS mt ON m.member_type_id=mt.member_type_id
+        LEFT JOIN item AS i ON i.item_code=l.item_code
+        LEFT JOIN biblio AS b ON i.biblio_id=b.biblio_id';
 
     // create datagrid
     $reportgrid = new report_datagrid();
     $isreturn = intval($_GET['is_return']);
     $reportgrid->setSQLColumn('m.generation AS \''.__('Generation').'\'','m.major AS \''.__('Major').'\'','m.member_id AS \''.__('Member ID').'\'',
         'm.member_name AS \''.__('Member Name').'\'',
-        'mt.member_type_name AS \''.__('Membership Type').'\'');
+        'mt.member_type_name AS \''.__('Membership Type').'\'',
+        'b.title AS \''.__('Item Title').'\'',
+        'l.item_code AS \''.__('Item Code').'\'',
+        'l.last_update AS \''.__('Date').'\'',
+        'IF(l.is_return = 0,\''.__('On Loan').'\', \''.__('Returned').'\') AS \''.__('Status').'\'');
     $reportgrid->setSQLorder('m.member_name ASC');
 
     // is there any search
@@ -285,9 +291,13 @@ if (!$reportView) {
     echo '<script type="text/javascript">'."\n";
     echo 'parent.$(\'#pagingBox\').html(\''.str_replace(array("\n", "\r", "\t"), '', $reportgrid->paging_set).'\');'."\n";
     echo '</script>';
-	$xlsquery = 'SELECT m.member_id AS \''.__('Member ID').'\''.
-        ', m.member_name AS \''.__('Member Name').'\''.
-        ', mt.member_type_name AS \''.__('Membership Type').'\' FROM '.$table_spec.' WHERE '.$criteria;
+	$xlsquery = 'SELECT m.generation AS \''.__('Generation').'\'','m.major AS \''.__('Major').'\'','m.member_id AS \''.__('Member ID').'\'',
+      'm.member_name AS \''.__('Member Name').'\'',
+      'mt.member_type_name AS \''.__('Membership Type').'\'',
+      'b.title AS \''.__('Item Title').'\'',
+      'l.item_code AS \''.__('Item Code').'\'',
+      'l.last_update AS \''.__('Date').'\'',
+      'IF(l.is_return = 0,\''.__('On Loan').'\', \''.__('Returned').'\') AS \''.__('Status').'\' FROM '.$table_spec.' WHERE '.$criteria;
 
 	unset($_SESSION['xlsdata']);
 	$_SESSION['xlsquery'] = $xlsquery;

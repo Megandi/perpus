@@ -147,10 +147,10 @@ if (!$reportView) {
     <!-- filter end -->
     <div class="dataListHeader" style="padding: 3px;"><span id="pagingBox"></span></div>
     <iframe name="reportView" id="reportView" src="<?php echo $_SERVER['PHP_SELF'].'?reportView=true'; ?>" frameborder="0" style="width: 100%; height: 500px;"></iframe>
-     <iframe name="reportViewlist" id="reportViewlist" src="<?php echo $_SERVER['PHP_SELF'].'?reportViewlist=true'; ?>" frameborder="0" style="width: 100%; height: 300px;padding:10px;"></iframe>
-     <?php
-    } else {
-
+        <div class="dataListHeader" style="padding: 3px;"></div>
+     <iframe name="reportViewlist" id="reportViewlist" src="<?php echo $_SERVER['PHP_SELF'].'?reportViewlist=blank'; ?>" frameborder="0" style="width: 100%; height: 300px;"></iframe>
+<?php
+} else {
     ob_start();
     // table spec
     $table_spec = 'fines';
@@ -174,6 +174,7 @@ if (!$reportView) {
     if (isset($_GET['by']) AND !empty($_GET['by']) AND isset($_GET['tipe']) AND !empty($_GET['tipe']) ) {
         $sort_by = $dbs->escape_string(trim($_GET['by']));
         $sort_tipe = $dbs->escape_string(trim($_GET['tipe']));
+
         $criteria .= ' GROUP BY fines_date ';
         $reportgrid->setSQLorder($sort_tipe.' '.$sort_by);
     }
@@ -190,9 +191,8 @@ if (!$reportView) {
     echo '<script type="text/javascript">'."\n";
     echo 'parent.$(\'#pagingBox\').html(\''.str_replace(array("\n", "\r", "\t"), '', $reportgrid->paging_set).'\');'."\n";
     echo '</script>';
-	$xlsquery = 'SELECT m.member_id AS \''.__('Member ID').'\''.
-        ', m.member_name AS \''.__('Member Name').'\''.
-        ', mt.member_type_name AS \''.__('Membership Type').'\' FROM '.$table_spec.' WHERE '.$criteria;
+	$xlsquery = 'SELECT fines_date AS \''.__('Fines Date').'\''.
+        ', SUM(debet) AS \''.__('Total').'\' FROM '.$table_spec.' WHERE '.$criteria;
 
 	unset($_SESSION['xlsdata']);
 	$_SESSION['xlsquery'] = $xlsquery;
