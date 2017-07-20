@@ -54,10 +54,10 @@ function visitOnLoan($member_id)
         $mquery = $dbs->query('SELECT member_name, inst_name FROM member WHERE member_id=\''.$member_id.'\'');
         $mdata = $mquery->fetch_row();
         $member_name = $mdata[0];
-        $institution = $mdata[1];
+        $activites = "Loan Transaction";
         // insert visit
         $checkin_date  = date('Y-m-d H:i:s');
-        $insert = $dbs->query("INSERT INTO visitor_count (member_id, member_name, institution, checkin_date) VALUES ('$member_id', '$member_name', '$institution', '$checkin_date')");
+        $insert = $dbs->query("INSERT INTO visitor_count (member_id, activities, checkin_date) VALUES ('$member_id', '$activites', '$checkin_date')");
         if (!$insert) {
             utility::jsAlert(__('ERROR! Can\'t insert visitor counter data'));
             return false;
@@ -72,7 +72,7 @@ if (isset($_POST['finish'])) {
     // create circulation object
     $memberID = $dbs->escape_string($_SESSION['memberID']);
     $circulation = new circulation($dbs, $memberID);
-    // finish loan transaction    
+    // finish loan transaction
     $flush = $circulation->finishLoanSession();
     if ($flush == TRANS_FLUSH_ERROR) {
         // write log
@@ -553,7 +553,7 @@ if (isset($_POST['memberID']) OR isset($_SESSION['memberID'])) {
         if ($fines_alert) {
             echo '<li><a accesskey="F" class="tab notAJAX" href="'.MWB.'circulation/fines_list.php" target="listsFrame"><span style="color: red; font-weight: bold;">'.__('Fines').' (F)</span></a></li>';
         } else {
-            echo '<li><a accesskey="F" class="tab notAJAX" href="'.MWB.'circulation/fines_list.php" target="listsFrame">'.__('Fines').' (F)</a></li>';            
+            echo '<li><a accesskey="F" class="tab notAJAX" href="'.MWB.'circulation/fines_list.php" target="listsFrame">'.__('Fines').' (F)</a></li>';
         }
         echo '<li><a accesskey="H" class="tab notAJAX" href="'.MWB.'circulation/member_loan_hist.php" target="listsFrame">'.__('Loan History').' (H)</a></li>'."\n";
         echo '</ul>';

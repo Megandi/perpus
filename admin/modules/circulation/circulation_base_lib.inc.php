@@ -177,7 +177,7 @@ class circulation extends member
                         WHERE rs.item_code='$str_item_code' ORDER BY reserve_date ASC LIMIT 1");
                     $_resv2_d = $_resv2_q->fetch_assoc();
                     if ($_resv2_d['member_id'] != $_SESSION['memberID']) {
-                        return ITEM_RESERVED;    
+                        return ITEM_RESERVED;
                     }
                 }
             }
@@ -262,7 +262,7 @@ class circulation extends member
             $this->overdue_days = $_fines['days'];
             $overdue_description = str_replace("{item_code}", $_fines['item'], __("Overdue fines for item {item_code}"));
             if (is_numeric($this->overdue_days) AND $this->overdue_days > 0) {
-                $this->obj_db->query("INSERT INTO fines VALUES(NULL, '$_return_date', '".$this->member_id ."', ".$_fines['value'].", 0, '". $this->obj_db->escape_string($overdue_description) ."')");
+                $this->obj_db->query("INSERT INTO fines VALUES(NULL, '$_return_date', '".$this->member_id ."', ".$_fines['value'].", 0, '". $this->obj_db->escape_string($overdue_description) ."', '".$int_loan_id ."')");
             }
             // add to receipt
             if (isset($_SESSION['receipt_record'])) {
@@ -359,7 +359,7 @@ class circulation extends member
         if ($_date == $str_return_date) {
             // how many days the overdue
             $_overdue_days = simbio_date::calcDay($str_return_date, $_loan_d[0]);
-            
+
             /* modified by Indra Sutriadi */
             if ($this->ignore_holidays_fine_calc === true) {
                 // count holiday and subtract it from overdue days
@@ -367,7 +367,7 @@ class circulation extends member
                 $_overdue_days = $_overdue_days-$_holiday_count;
             }
             /* end of modification */
-            
+
             if ($_overdue_days < 1) {
                 return false;
             }

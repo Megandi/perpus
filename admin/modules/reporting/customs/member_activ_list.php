@@ -194,7 +194,7 @@ if (!$reportView) {
             $tipe_options[] = array('generation', __('Generation'));
             $by_options[] = array('ASC', __('ASC'));
             $by_options[] = array('DESC', __('DESC'));
-            echo simbio_form_element::selectList('tipe', $tipe_options);             
+            echo simbio_form_element::selectList('tipe', $tipe_options);
             echo simbio_form_element::selectList('by', $by_options);
 
             ?>
@@ -270,11 +270,11 @@ if (!$reportView) {
         $recsEachPage = (integer)$_GET['recsEachPage'];
         $num_recs_show = ($recsEachPage >= 20 && $recsEachPage <= 90000)?$recsEachPage:$num_recs_show;
     }
-     // sort bay
+     // sort by
     if (isset($_GET['by']) AND !empty($_GET['by']) AND isset($_GET['tipe']) AND !empty($_GET['tipe']) ) {
         $sort_by = $dbs->escape_string(trim($_GET['by']));
         $sort_tipe = $dbs->escape_string(trim($_GET['tipe']));
-        $reportgrid->setSQLorder($sort_tipe.' '.$sort_by);  
+        $reportgrid->setSQLorder($sort_tipe.' '.$sort_by);
     }
     else
     {

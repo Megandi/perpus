@@ -33,7 +33,7 @@ if (!defined('INDEX_AUTH')) {
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'perpus');
 define('DB_USERNAME', 'root');
-define('DB_PASSWORD', '');
+define('DB_PASSWORD', 'root');
 
 // define any other sysconfig variables below
 $sysconf['index']['type'] = 'default';

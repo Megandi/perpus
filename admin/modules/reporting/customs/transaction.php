@@ -175,6 +175,32 @@ if (!$reportView) {
     <input type="submit" name="applyFilter" value="<?php echo __('Apply Filter'); ?>" />
     <input type="hidden" name="reportView" value="true" />
     </div>
+    <div style=" float: right; margin-top: 12px; width: calc(100% + 10px);"  >
+    <div class="infoBox" style="">
+    <?php echo __('Report Sort By'); ?>
+    </div>
+    <div class="sub_section">
+    <div id="filterForm">
+        <div class="divRow">
+            <div class="divRowContent">
+            <?php
+            $tipe_options[] = array('generation', __('Generation'));
+            $tipe_options[] = array('major', __('Major'));
+            $tipe_options[] = array('m.member_id', __('Member ID'));
+            $tipe_options[] = array('member_name', __('Name'));
+            $by_options[] = array('ASC', __('ASC'));
+            $by_options[] = array('DESC', __('DESC'));
+            echo simbio_form_element::selectList('tipe', $tipe_options);
+            echo simbio_form_element::selectList('by', $by_options);
+
+            ?>
+            </div>
+            <div style="padding-top: 10px; clear: both;">
+    <input type="submit" name="applyFilter" value="<?php echo __('Apply Sort by'); ?>" />
+    </div>
+        </div>
+    </div>
+    </div>
     </form>
 	</div>
     </fieldset>
@@ -196,7 +222,7 @@ if (!$reportView) {
     $reportgrid->setSQLColumn('m.generation AS \''.__('Generation').'\'','m.major AS \''.__('Major').'\'','m.member_id AS \''.__('Member ID').'\'',
         'm.member_name AS \''.__('Member Name').'\'',
         'mt.member_type_name AS \''.__('Membership Type').'\'');
-    $reportgrid->setSQLorder('member_name ASC');
+    $reportgrid->setSQLorder('m.member_name ASC');
 
     // is there any search
     $criteria = 'm.member_id IS NOT NULL AND TO_DAYS(expire_date)>TO_DAYS(\''.date('Y-m-d').'\')';
@@ -237,8 +263,20 @@ if (!$reportView) {
     }
     if (isset($_GET['recsEachPage'])) {
         $recsEachPage = (integer)$_GET['recsEachPage'];
-        $num_recs_show = ($recsEachPage >= 20 && $recsEachPage <= 200)?$recsEachPage:$num_recs_show;
+        $num_recs_show = ($recsEachPage >= 20 && $recsEachPage <= 90000)?$recsEachPage:$num_recs_show;
     }
+
+    // sort bay
+    if (isset($_GET['by']) AND !empty($_GET['by']) AND isset($_GET['tipe']) AND !empty($_GET['tipe']) ) {
+        $sort_by = $dbs->escape_string(trim($_GET['by']));
+        $sort_tipe = $dbs->escape_string(trim($_GET['tipe']));
+        $reportgrid->setSQLorder($sort_tipe.' '.$sort_by);
+    }
+    else
+    {
+      $reportgrid->setSQLorder('m.member_name ASC');
+    }
+
     $reportgrid->setSQLCriteria($criteria);
 
     // put the result into variables
