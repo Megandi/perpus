@@ -151,7 +151,7 @@ if (isset($_POST['saveData']) AND $can_read AND $can_write) {
         $data['major'] = trim($dbs->escape_string(strip_tags($_POST['major'])));
         $data['is_pending'] = isset($_POST['isPending'])? intval($_POST['isPending']) : '0';
         $data['input_date'] = date('Y-m-d');
-        $data['last_update'] = date('Y-m-d');
+        $dbs['last_update'] = date('Y-m-d');
         if (!empty($_FILES['image']) AND $_FILES['image']['size']) {
           // create upload object
           $upload = new simbio_file_upload();
